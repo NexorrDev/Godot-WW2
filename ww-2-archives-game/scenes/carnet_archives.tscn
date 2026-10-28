@@ -1,0 +1,272 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://scripts/carnet_archives.gd" id="1_carnet"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_main"]
+bg_color = Color(0.12, 0.11, 0.1, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.68, 0.58, 0.42, 0.9)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+expand_margin_left = 16.0
+expand_margin_top = 16.0
+expand_margin_right = 16.0
+expand_margin_bottom = 16.0
+shadow_color = Color(0, 0, 0, 0.8)
+shadow_size = 35
+
+[sub_resource type="LabelSettings" id="LabelSettings_subtitle"]
+font_size = 11
+font_color = Color(0.8, 0.72, 0.52, 0.9)
+
+[sub_resource type="LabelSettings" id="LabelSettings_title"]
+font_size = 20
+font_color = Color(0.96, 0.94, 0.9, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_counter"]
+font_size = 13
+font_color = Color(0.95, 0.82, 0.45, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_progress_bg"]
+bg_color = Color(0.08, 0.08, 0.07, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_progress_fill"]
+bg_color = Color(0.85, 0.68, 0.32, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_btn"]
+bg_color = Color(0.25, 0.22, 0.18, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.55, 0.48, 0.35, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_period_col"]
+bg_color = Color(0.08, 0.08, 0.07, 0.7)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.32, 0.28, 0.6)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+
+[sub_resource type="LabelSettings" id="LabelSettings_col_header"]
+font_size = 12
+font_color = Color(0.9, 0.84, 0.7, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_toast"]
+bg_color = Color(0.12, 0.11, 0.09, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.92, 0.78, 0.35, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 20.0
+content_margin_top = 8.0
+content_margin_right = 20.0
+content_margin_bottom = 8.0
+shadow_color = Color(0, 0, 0, 0.6)
+shadow_size = 12
+
+[node name="CarnetArchives" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_carnet")
+
+[node name="RootControl" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Backdrop" type="ColorRect" parent="RootControl"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.04, 0.04, 0.04, 0.78)
+
+[node name="MainPanel" type="PanelContainer" parent="RootControl"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -560.0
+offset_top = -320.0
+offset_right = 560.0
+offset_bottom = 320.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_main")
+
+[node name="VBox" type="VBoxContainer" parent="RootControl/MainPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="HeaderHBox" type="HBoxContainer" parent="RootControl/MainPanel/VBox"]
+layout_mode = 2
+
+[node name="TitleBox" type="VBoxContainer" parent="RootControl/MainPanel/VBox/HeaderHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SubTitle" type="Label" parent="RootControl/MainPanel/VBox/HeaderHBox/TitleBox"]
+layout_mode = 2
+text = "ÉTAT-MAJOR GÉNÉRAL • REGISTRE DE GUERRE"
+label_settings = SubResource("LabelSettings_subtitle")
+
+[node name="MainTitle" type="Label" parent="RootControl/MainPanel/VBox/HeaderHBox/TitleBox"]
+layout_mode = 2
+text = "CARNET DES ARCHIVES HISTORIQUES (1939 - 1945)"
+label_settings = SubResource("LabelSettings_title")
+
+[node name="ProgressionBox" type="VBoxContainer" parent="RootControl/MainPanel/VBox/HeaderHBox"]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+alignment = 1
+
+[node name="CounterLabel" type="Label" parent="RootControl/MainPanel/VBox/HeaderHBox/ProgressionBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "PROGRESSION : 0 / 15 ARCHIVES"
+label_settings = SubResource("LabelSettings_counter")
+horizontal_alignment = 2
+
+[node name="ProgressBar" type="ProgressBar" parent="RootControl/MainPanel/VBox/HeaderHBox/ProgressionBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_progress_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_progress_fill")
+max_value = 15.0
+show_percentage = false
+
+[node name="ControlSpacer" type="Control" parent="RootControl/MainPanel/VBox/HeaderHBox"]
+custom_minimum_size = Vector2(16, 0)
+layout_mode = 2
+
+[node name="CloseButton" type="Button" parent="RootControl/MainPanel/VBox/HeaderHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/normal = SubResource("StyleBoxFlat_close_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_close_btn")
+text = "FERMER LE REGISTRE [TAB]"
+
+[node name="HSeparator1" type="HSeparator" parent="RootControl/MainPanel/VBox"]
+layout_mode = 2
+
+[node name="ColumnsHBox" type="HBoxContainer" parent="RootControl/MainPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="ColPeriod1" type="PanelContainer" parent="RootControl/MainPanel/VBox/ColumnsHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_period_col")
+
+[node name="VBox" type="VBoxContainer" parent="RootControl/MainPanel/VBox/ColumnsHBox/ColPeriod1"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Header1" type="Label" parent="RootControl/MainPanel/VBox/ColumnsHBox/ColPeriod1/VBox"]
+layout_mode = 2
+text = "PÉRIODE 1 (1939-1941)
+LES VICTOIRES DE L'AXE"
+label_settings = SubResource("LabelSettings_col_header")
+horizontal_alignment = 1
+
+[node name="Period1Container" type="VBoxContainer" parent="RootControl/MainPanel/VBox/ColumnsHBox/ColPeriod1/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="ColPeriod2" type="PanelContainer" parent="RootControl/MainPanel/VBox/ColumnsHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_period_col")
+
+[node name="VBox" type="VBoxContainer" parent="RootControl/MainPanel/VBox/ColumnsHBox/ColPeriod2"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Header2" type="Label" parent="RootControl/MainPanel/VBox/ColumnsHBox/ColPeriod2/VBox"]
+layout_mode = 2
+text = "PÉRIODE 2 (1942-1943)
+LE TOURNANT DE LA GUERRE"
+label_settings = SubResource("LabelSettings_col_header")
+horizontal_alignment = 1
+
+[node name="Period2Container" type="VBoxContainer" parent="RootControl/MainPanel/VBox/ColumnsHBox/ColPeriod2/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="ColPeriod3" type="PanelContainer" parent="RootControl/MainPanel/VBox/ColumnsHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_period_col")
+
+[node name="VBox" type="VBoxContainer" parent="RootControl/MainPanel/VBox/ColumnsHBox/ColPeriod3"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Header3" type="Label" parent="RootControl/MainPanel/VBox/ColumnsHBox/ColPeriod3/VBox"]
+layout_mode = 2
+text = "PÉRIODE 3 (1944-1945)
+LA VICTOIRE DES ALLIÉS"
+label_settings = SubResource("LabelSettings_col_header")
+horizontal_alignment = 1
+
+[node name="Period3Container" type="VBoxContainer" parent="RootControl/MainPanel/VBox/ColumnsHBox/ColPeriod3/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="FooterLabel" type="Label" parent="RootControl/MainPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.62, 0.58, 1)
+theme_override_font_sizes/font_size = 12
+text = "[ CONSEIL ] Cliquez sur une archive débloquée pour consulter sa fiche officielle et son vocabulaire. [TAB] ou [ÉCHAP] pour fermer."
+horizontal_alignment = 1

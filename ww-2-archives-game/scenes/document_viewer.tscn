@@ -1,0 +1,312 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://scripts/document_viewer.gd" id="1_viewer"]
+
+[sub_resource type="SystemFont" id="SystemFont_typewriter"]
+font_names = PackedStringArray("Courier New", "Consolas", "Courier", "monospace")
+font_weight = 600
+
+[sub_resource type="SystemFont" id="SystemFont_serif"]
+font_names = PackedStringArray("Georgia", "Times New Roman", "serif")
+font_weight = 700
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_folder_manila"]
+bg_color = Color(0.70, 0.58, 0.42, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.42, 0.32, 0.20, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_color = Color(0, 0, 0, 0.85)
+shadow_size = 40
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_folder_tab"]
+bg_color = Color(0.62, 0.50, 0.35, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_color = Color(0.42, 0.32, 0.20, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+content_margin_left = 16.0
+content_margin_top = 4.0
+content_margin_right = 16.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_paper"]
+bg_color = Color(0.96, 0.94, 0.88, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.75, 0.70, 0.60, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+shadow_color = Color(0.3, 0.25, 0.2, 0.4)
+shadow_size = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stamp"]
+bg_color = Color(0.85, 0.22, 0.18, 0.08)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.78, 0.20, 0.15, 0.85)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+
+[sub_resource type="LabelSettings" id="LabelSettings_stamp"]
+font = SubResource("SystemFont_typewriter")
+font_size = 11
+font_color = Color(0.78, 0.20, 0.15, 0.9)
+
+[sub_resource type="LabelSettings" id="LabelSettings_gqg"]
+font = SubResource("SystemFont_serif")
+font_size = 11
+font_color = Color(0.35, 0.30, 0.25, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_period"]
+font = SubResource("SystemFont_typewriter")
+font_size = 12
+font_color = Color(0.45, 0.38, 0.30, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_title"]
+font = SubResource("SystemFont_typewriter")
+font_size = 20
+font_color = Color(0.12, 0.10, 0.08, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_meta"]
+font = SubResource("SystemFont_typewriter")
+font_size = 13
+font_color = Color(0.25, 0.22, 0.18, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_btn"]
+bg_color = Color(0.24, 0.20, 0.16, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.55, 0.48, 0.38, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+content_margin_left = 24.0
+content_margin_top = 10.0
+content_margin_right = 24.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_hover"]
+bg_color = Color(0.36, 0.30, 0.24, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85, 0.72, 0.50, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+content_margin_left = 24.0
+content_margin_top = 10.0
+content_margin_right = 24.0
+content_margin_bottom = 10.0
+
+[node name="DocumentViewer" type="CanvasLayer"]
+layer = 20
+script = ExtResource("1_viewer")
+
+[node name="RootControl" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Backdrop" type="ColorRect" parent="RootControl"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.04, 0.04, 0.04, 0.8)
+
+[node name="Center" type="CenterContainer" parent="RootControl"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="DossierWrapper" type="VBoxContainer" parent="RootControl/Center"]
+custom_minimum_size = Vector2(800, 0)
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="FolderTab" type="PanelContainer" parent="RootControl/Center/DossierWrapper"]
+custom_minimum_size = Vector2(280, 26)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_folder_tab")
+
+[node name="TabLabel" type="Label" parent="RootControl/Center/DossierWrapper/FolderTab"]
+layout_mode = 2
+theme_override_fonts/font = SubResource("SystemFont_typewriter")
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.96, 0.94, 0.88, 1)
+text = "DOSSIER ARCHIVE MILITAIRE // CLASSIFIÉ"
+
+[node name="ManilaPanel" type="PanelContainer" parent="RootControl/Center/DossierWrapper"]
+custom_minimum_size = Vector2(800, 560)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_folder_manila")
+
+[node name="ManilaMargin" type="MarginContainer" parent="RootControl/Center/DossierWrapper/ManilaPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="PaperPanel" type="PanelContainer" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_paper")
+
+[node name="PaperMargin" type="MarginContainer" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 28
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 24
+
+[node name="VBox" type="VBoxContainer" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TopHeaderHBox" type="HBoxContainer" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox"]
+layout_mode = 2
+
+[node name="OfficialVBox" type="VBoxContainer" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/TopHeaderHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="GqgLabel" type="Label" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/TopHeaderHBox/OfficialVBox"]
+layout_mode = 2
+text = "COMMANDEMENT DES FORCES ARMÉES • ÉTAT-MAJOR GÉNÉRAL"
+label_settings = SubResource("LabelSettings_gqg")
+
+[node name="PeriodLabel" type="Label" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/TopHeaderHBox/OfficialVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "PÉRIODE 1 : LES VICTOIRES DE L'AXE (1939-1941)"
+label_settings = SubResource("LabelSettings_period")
+
+[node name="RefLabel" type="Label" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/TopHeaderHBox/OfficialVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = SubResource("SystemFont_typewriter")
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.55, 0.48, 0.40, 1)
+text = "RÉFÉRENCE : GQG/ARCH-POLOGNE_1939"
+
+[node name="StampContainer" type="Control" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/TopHeaderHBox"]
+custom_minimum_size = Vector2(210, 56)
+layout_mode = 2
+
+[node name="StampPanel" type="PanelContainer" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/TopHeaderHBox/StampContainer"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -26.0
+offset_right = 100.0
+offset_bottom = 26.0
+grow_horizontal = 2
+grow_vertical = 2
+rotation = -0.08
+theme_override_styles/panel = SubResource("StyleBoxFlat_stamp")
+
+[node name="StampText" type="Label" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/TopHeaderHBox/StampContainer/StampPanel"]
+layout_mode = 2
+text = "★ SECRET DÉFENSE ★
+DÉCLASSIFIÉ POUR LES ARCHIVES"
+label_settings = SubResource("LabelSettings_stamp")
+horizontal_alignment = 1
+
+[node name="HSeparator1" type="HSeparator" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "OBJET : INVASION DU TERRITOIRE POLONAIS (BLITZKRIEG)"
+label_settings = SubResource("LabelSettings_title")
+autowrap_mode = 2
+
+[node name="MetaBox" type="VBoxContainer" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="DateLabel" type="Label" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/MetaBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "DATE OFFICIELLE : 1er Septembre 1939"
+label_settings = SubResource("LabelSettings_meta")
+
+[node name="LocationLabel" type="Label" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/MetaBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "THÉÂTRE DES OPÉRATIONS : Pologne (frontière germano-polonaise, Varsovie)"
+label_settings = SubResource("LabelSettings_meta")
+
+[node name="HSeparator2" type="HSeparator" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox"]
+layout_mode = 2
+
+[node name="SummaryLabel" type="RichTextLabel" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 160)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/default_color = Color(0.12, 0.10, 0.08, 1)
+theme_override_fonts/normal_font = SubResource("SystemFont_typewriter")
+theme_override_fonts/bold_font = SubResource("SystemFont_typewriter")
+theme_override_font_sizes/normal_font_size = 15
+theme_override_font_sizes/bold_font_size = 15
+bbcode_enabled = true
+text = "Explication historique détaillée avec le vocabulaire officiel..."
+
+[node name="ButtonBox" type="HBoxContainer" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox"]
+layout_mode = 2
+alignment = 1
+
+[node name="CloseButton" type="Button" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/ButtonBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(440, 42)
+layout_mode = 2
+theme_override_fonts/font = SubResource("SystemFont_typewriter")
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.96, 0.93, 0.85, 1)
+theme_override_colors/font_hover_color = Color(1, 0.95, 0.85, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_close_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_close_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_close_btn")
+text = "RECLASSER LE DOSSIER DANS LES ARCHIVES [E / ÉCHAP]"

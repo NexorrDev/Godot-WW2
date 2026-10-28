@@ -1,0 +1,340 @@
+[gd_scene load_steps=6 format=3 uid="uid://cxo7n82k0m3v1"]
+
+[ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_menu"]
+
+[sub_resource type="Gradient" id="Gradient_shade"]
+colors = PackedColorArray(0.05, 0.05, 0.06, 0.65, 0.05, 0.05, 0.06, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_shade"]
+gradient = SubResource("Gradient_shade")
+fill_to = Vector2(1, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_title"]
+bg_color = Color(0.85, 0.81, 0.74, 0.96)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+expand_margin_left = 16.0
+expand_margin_top = 4.0
+expand_margin_right = 16.0
+expand_margin_bottom = 4.0
+shadow_color = Color(0, 0, 0, 0.4)
+shadow_size = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_popup"]
+bg_color = Color(0.12, 0.11, 0.11, 0.97)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.8, 0.74, 0.62, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+expand_margin_left = 20.0
+expand_margin_top = 20.0
+expand_margin_right = 20.0
+expand_margin_bottom = 20.0
+shadow_color = Color(0, 0, 0, 0.8)
+shadow_size = 25
+
+[node name="MainMenu" type="CanvasLayer"]
+layer = 5
+script = ExtResource("1_menu")
+
+[node name="MenuRoot" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LeftShade" type="TextureRect" parent="MenuRoot"]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 600.0
+grow_vertical = 2
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_shade")
+expand_mode = 1
+
+[node name="LeftMenuContainer" type="VBoxContainer" parent="MenuRoot"]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 130.0
+offset_right = 430.0
+offset_bottom = 580.0
+theme_override_constants/separation = 22
+
+[node name="TitleBox" type="HBoxContainer" parent="MenuRoot/LeftMenuContainer"]
+layout_mode = 2
+
+[node name="TitlePanel" type="PanelContainer" parent="MenuRoot/LeftMenuContainer/TitleBox"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_title")
+
+[node name="TitleLabel" type="Label" parent="MenuRoot/LeftMenuContainer/TitleBox/TitlePanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.12, 0.12, 0.12, 1)
+theme_override_font_sizes/font_size = 46
+text = "LES ARCHIVES"
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="MenuRoot/LeftMenuContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.69, 0.64, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 22
+text = "Une histoire oubliée..."
+
+[node name="Spacer" type="Control" parent="MenuRoot/LeftMenuContainer"]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+
+[node name="ButtonsList" type="VBoxContainer" parent="MenuRoot/LeftMenuContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BtnNewGame" type="Button" parent="MenuRoot/LeftMenuContainer/ButtonsList"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(230, 42)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 22
+text = "▶  Nouvelle partie"
+alignment = 0
+
+[node name="BtnContinue" type="Button" parent="MenuRoot/LeftMenuContainer/ButtonsList"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(230, 42)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 22
+text = "    Continuer"
+alignment = 0
+
+[node name="BtnSettings" type="Button" parent="MenuRoot/LeftMenuContainer/ButtonsList"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(230, 42)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 22
+text = "    Paramètres"
+alignment = 0
+
+[node name="BtnCredits" type="Button" parent="MenuRoot/LeftMenuContainer/ButtonsList"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(230, 42)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 22
+text = "    Crédits"
+alignment = 0
+
+[node name="BtnQuit" type="Button" parent="MenuRoot/LeftMenuContainer/ButtonsList"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(230, 42)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 22
+text = "    Quitter"
+alignment = 0
+
+[node name="SettingsPanel" type="PanelContainer" parent="MenuRoot"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(480, 420)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -210.0
+offset_right = 240.0
+offset_bottom = 210.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_popup")
+
+[node name="Margin" type="MarginContainer" parent="MenuRoot/SettingsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="MenuRoot/SettingsPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="Title" type="Label" parent="MenuRoot/SettingsPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.81, 0.74, 1)
+theme_override_font_sizes/font_size = 24
+text = "PARAMÈTRES"
+horizontal_alignment = 1
+
+[node name="HSeparator1" type="HSeparator" parent="MenuRoot/SettingsPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="CheckFullscreen" type="CheckBox" parent="MenuRoot/SettingsPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 15
+text = "Activer le mode Plein écran"
+
+[node name="SensBox" type="HBoxContainer" parent="MenuRoot/SettingsPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SensLabel" type="Label" parent="MenuRoot/SettingsPanel/Margin/VBox/SensBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 15
+text = "Sensibilité de la souris :"
+
+[node name="SliderSensitivity" type="HSlider" parent="MenuRoot/SettingsPanel/Margin/VBox/SensBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+size_flags_vertical = 4
+min_value = 0.5
+max_value = 2.0
+step = 0.1
+value = 1.0
+
+[node name="LabelSensitivityVal" type="Label" parent="MenuRoot/SettingsPanel/Margin/VBox/SensBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.75, 0.65, 1)
+theme_override_font_sizes/font_size = 14
+text = "100%"
+horizontal_alignment = 2
+
+[node name="FovBox" type="HBoxContainer" parent="MenuRoot/SettingsPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="FovLabel" type="Label" parent="MenuRoot/SettingsPanel/Margin/VBox/FovBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 15
+text = "Champ de vision (FOV) :"
+
+[node name="SliderFov" type="HSlider" parent="MenuRoot/SettingsPanel/Margin/VBox/FovBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+size_flags_vertical = 4
+min_value = 60.0
+max_value = 95.0
+step = 1.0
+value = 75.0
+
+[node name="LabelFovVal" type="Label" parent="MenuRoot/SettingsPanel/Margin/VBox/FovBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.75, 0.65, 1)
+theme_override_font_sizes/font_size = 14
+text = "75°"
+horizontal_alignment = 2
+
+[node name="CheckHeadBob" type="CheckBox" parent="MenuRoot/SettingsPanel/Margin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 15
+button_pressed = true
+text = "Balancement de marche (Head Bobbing)"
+
+[node name="HSeparator2" type="HSeparator" parent="MenuRoot/SettingsPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="ControlsInfo" type="Label" parent="MenuRoot/SettingsPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.68, 0.65, 1)
+theme_override_font_sizes/font_size = 13
+text = "Commandes :
+• Déplacement : ZQSD / WASD / Flèches
+• Viser / Regarder : Souris
+• Examiner / Interagir : Touche E
+• Menu / Libérer souris : Touche Échap"
+horizontal_alignment = 1
+
+[node name="CloseSettingsBtn" type="Button" parent="MenuRoot/SettingsPanel/Margin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 36)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Fermer"
+
+[node name="CreditsPanel" type="PanelContainer" parent="MenuRoot"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(440, 290)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -145.0
+offset_right = 220.0
+offset_bottom = 145.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_popup")
+
+[node name="Margin" type="MarginContainer" parent="MenuRoot/CreditsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="MenuRoot/CreditsPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="Title" type="Label" parent="MenuRoot/CreditsPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.81, 0.74, 1)
+theme_override_font_sizes/font_size = 24
+text = "CRÉDITS"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="MenuRoot/CreditsPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="Text" type="RichTextLabel" parent="MenuRoot/CreditsPanel/Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[center][color=#dcd6ca][b]Code :[/b][/color] Thomas, Raphaël
+[color=#dcd6ca][b]Modélisation 3D :[/b][/color] Louka
+[color=#dcd6ca][b]Game Design :[/b][/color] Ilyem
+
+[color=#a09a8e]Développé avec Godot Engine 4[/color][/center]"
+
+[node name="CloseCreditsBtn" type="Button" parent="MenuRoot/CreditsPanel/Margin/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 36)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Fermer"

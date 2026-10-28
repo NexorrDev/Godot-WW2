@@ -1,0 +1,358 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://scripts/enigmas/enigma_radio.gd" id="1_radio"]
+
+[sub_resource type="SystemFont" id="SystemFont_typewriter"]
+font_names = PackedStringArray("Courier New", "Consolas", "Courier", "monospace")
+font_weight = 600
+
+[sub_resource type="SystemFont" id="SystemFont_serif"]
+font_names = PackedStringArray("Georgia", "Times New Roman", "serif")
+font_weight = 700
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_chassis"]
+bg_color = Color(0.14, 0.09, 0.06, 0.99)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.68, 0.52, 0.30, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+expand_margin_left = 18.0
+expand_margin_top = 18.0
+expand_margin_right = 18.0
+expand_margin_bottom = 18.0
+shadow_color = Color(0, 0, 0, 0.9)
+shadow_size = 45
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dial_glass"]
+bg_color = Color(0.06, 0.05, 0.03, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.50, 0.40, 0.25, 0.9)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 18.0
+content_margin_top = 14.0
+content_margin_right = 18.0
+content_margin_bottom = 14.0
+shadow_color = Color(0.6, 0.4, 0.1, 0.15)
+shadow_size = 8
+
+[sub_resource type="LabelSettings" id="LabelSettings_dial_title"]
+font = SubResource("SystemFont_serif")
+font_size = 15
+font_color = Color(0.92, 0.82, 0.65, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_freq_readout"]
+font = SubResource("SystemFont_typewriter")
+font_size = 20
+font_color = Color(0.98, 0.82, 0.42, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eye_bg"]
+bg_color = Color(0.03, 0.06, 0.03, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.18, 0.38, 0.20, 0.8)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eye_glow"]
+bg_color = Color(0.25, 0.85, 0.38, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+shadow_color = Color(0.2, 0.8, 0.3, 0.5)
+shadow_size = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_telegram"]
+bg_color = Color(0.94, 0.91, 0.82, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.72, 0.65, 0.52, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+content_margin_left = 18.0
+content_margin_top = 12.0
+content_margin_right = 18.0
+content_margin_bottom = 12.0
+shadow_color = Color(0, 0, 0, 0.4)
+shadow_size = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_val_btn"]
+bg_color = Color(0.68, 0.50, 0.24, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.90, 0.78, 0.52, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+content_margin_left = 24.0
+content_margin_top = 10.0
+content_margin_right = 24.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_val_hover"]
+bg_color = Color(0.80, 0.60, 0.30, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.90, 0.65, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+content_margin_left = 24.0
+content_margin_top = 10.0
+content_margin_right = 24.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_btn"]
+bg_color = Color(0.24, 0.17, 0.12, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.50, 0.40, 0.30, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+
+[node name="EnigmaRadio" type="CanvasLayer"]
+layer = 12
+script = ExtResource("1_radio")
+
+[node name="RootControl" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Backdrop" type="ColorRect" parent="RootControl"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.04, 0.03, 0.02, 0.8)
+
+[node name="ChassisPanel" type="PanelContainer" parent="RootControl"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -420.0
+offset_top = -300.0
+offset_right = 420.0
+offset_bottom = 300.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_chassis")
+
+[node name="VBox" type="VBoxContainer" parent="RootControl/ChassisPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HeaderHBox" type="HBoxContainer" parent="RootControl/ChassisPanel/VBox"]
+layout_mode = 2
+
+[node name="TitleBox" type="VBoxContainer" parent="RootControl/ChassisPanel/VBox/HeaderHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 1
+
+[node name="MainTitle" type="Label" parent="RootControl/ChassisPanel/VBox/HeaderHBox/TitleBox"]
+layout_mode = 2
+text = "POSTE RÉCEPTEUR MILITAIRE T.S.F. (MODÈLE 1938)"
+label_settings = SubResource("LabelSettings_dial_title")
+
+[node name="SubTitle" type="Label" parent="RootControl/ChassisPanel/VBox/HeaderHBox/TitleBox"]
+layout_mode = 2
+theme_override_fonts/font = SubResource("SystemFont_typewriter")
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.65, 0.55, 0.45, 1)
+text = "DÉPÊCHES D'ÉTAT-MAJOR // SYNTONISATION DES ONDES HERTZIENNES"
+
+[node name="CloseButton" type="Button" parent="RootControl/ChassisPanel/VBox/HeaderHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_fonts/font = SubResource("SystemFont_typewriter")
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.85, 0.80, 0.72, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_close_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_close_btn")
+text = "FERMER L'ÉCOUTE [ÉCHAP]"
+
+[node name="DialPanel" type="PanelContainer" parent="RootControl/ChassisPanel/VBox"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_dial_glass")
+
+[node name="DialVBox" type="VBoxContainer" parent="RootControl/ChassisPanel/VBox/DialPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="BandHeader" type="Label" parent="RootControl/ChassisPanel/VBox/DialPanel/DialVBox"]
+layout_mode = 2
+theme_override_fonts/font = SubResource("SystemFont_typewriter")
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.60, 0.50, 0.35, 1)
+text = "CADRAN AMBRÉ • ONDES MOYENNES (PO) • GAMME 150 - 550 kHz"
+horizontal_alignment = 1
+
+[node name="FreqLabel" type="Label" parent="RootControl/ChassisPanel/VBox/DialPanel/DialVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "FRÉQUENCE : 210 kHz  //  LONGUEUR D'ONDE : 1428 m"
+label_settings = SubResource("LabelSettings_freq_readout")
+horizontal_alignment = 1
+
+[node name="FreqSlider" type="HSlider" parent="RootControl/ChassisPanel/VBox/DialPanel/DialVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 150.0
+max_value = 550.0
+step = 1.0
+value = 210.0
+
+[node name="ScaleLabelsHBox" type="HBoxContainer" parent="RootControl/ChassisPanel/VBox/DialPanel/DialVBox"]
+layout_mode = 2
+
+[node name="Lbl150" type="Label" parent="RootControl/ChassisPanel/VBox/DialPanel/DialVBox/ScaleLabelsHBox"]
+layout_mode = 2
+theme_override_fonts/font = SubResource("SystemFont_typewriter")
+theme_override_colors/font_color = Color(0.55, 0.45, 0.32, 1)
+theme_override_font_sizes/font_size = 11
+text = "150 kHz (Paris PTT)"
+
+[node name="Spacer" type="Control" parent="RootControl/ChassisPanel/VBox/DialPanel/DialVBox/ScaleLabelsHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LblBBC" type="Label" parent="RootControl/ChassisPanel/VBox/DialPanel/DialVBox/ScaleLabelsHBox"]
+layout_mode = 2
+theme_override_fonts/font = SubResource("SystemFont_typewriter")
+theme_override_colors/font_color = Color(0.95, 0.80, 0.45, 1)
+theme_override_font_sizes/font_size = 12
+text = "[ 390 kHz • BBC LONDRES ]"
+
+[node name="Spacer2" type="Control" parent="RootControl/ChassisPanel/VBox/DialPanel/DialVBox/ScaleLabelsHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Lbl550" type="Label" parent="RootControl/ChassisPanel/VBox/DialPanel/DialVBox/ScaleLabelsHBox"]
+layout_mode = 2
+theme_override_fonts/font = SubResource("SystemFont_typewriter")
+theme_override_colors/font_color = Color(0.55, 0.45, 0.32, 1)
+theme_override_font_sizes/font_size = 11
+text = "550 kHz"
+
+[node name="MagicEyeHBox" type="HBoxContainer" parent="RootControl/ChassisPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="EyeTitle" type="Label" parent="RootControl/ChassisPanel/VBox/MagicEyeHBox"]
+layout_mode = 2
+theme_override_fonts/font = SubResource("SystemFont_typewriter")
+theme_override_colors/font_color = Color(0.70, 0.65, 0.55, 1)
+theme_override_font_sizes/font_size = 12
+text = "INDICATEUR CATHODIQUE (VALVE 6E5) :"
+
+[node name="SignalBar" type="ProgressBar" parent="RootControl/ChassisPanel/VBox/MagicEyeHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/background = SubResource("StyleBoxFlat_eye_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_eye_glow")
+value = 10.0
+show_percentage = false
+
+[node name="SignalStatusLabel" type="Label" parent="RootControl/ChassisPanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = SubResource("SystemFont_typewriter")
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.65, 0.60, 0.50, 1)
+text = "[SIGNAL NUL] HORS DE LA PORTEUSE RADIO — GRÉSILLEMENTS DE L'ÉTHER"
+horizontal_alignment = 1
+
+[node name="TranscriptPanel" type="PanelContainer" parent="RootControl/ChassisPanel/VBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_telegram")
+
+[node name="TranscriptVBox" type="VBoxContainer" parent="RootControl/ChassisPanel/VBox/TranscriptPanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="TelegramHeader" type="Label" parent="RootControl/ChassisPanel/VBox/TranscriptPanel/TranscriptVBox"]
+layout_mode = 2
+theme_override_fonts/font = SubResource("SystemFont_typewriter")
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.45, 0.38, 0.28, 1)
+text = "TRANSCRIPTION OFFICIELLE DU BULLETIN D'INFORMATION T.S.F. (3 SEPTEMBRE 1939)"
+
+[node name="TranscriptText" type="RichTextLabel" parent="RootControl/ChassisPanel/VBox/TranscriptPanel/TranscriptVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/default_color = Color(0.12, 0.10, 0.08, 1)
+theme_override_fonts/normal_font = SubResource("SystemFont_typewriter")
+theme_override_fonts/bold_font = SubResource("SystemFont_typewriter")
+theme_override_fonts/italic_font = SubResource("SystemFont_typewriter")
+theme_override_font_sizes/normal_font_size = 12
+theme_override_font_sizes/bold_font_size = 12
+theme_override_font_sizes/italic_font_size = 12
+bbcode_enabled = true
+text = "Retranscription de l'émission radiophonique..."
+
+[node name="FooterHBox" type="HBoxContainer" parent="RootControl/ChassisPanel/VBox"]
+layout_mode = 2
+alignment = 1
+
+[node name="ValidateButton" type="Button" parent="RootControl/ChassisPanel/VBox/FooterHBox"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(480, 40)
+layout_mode = 2
+theme_override_fonts/font = SubResource("SystemFont_typewriter")
+theme_override_colors/font_color = Color(0.12, 0.09, 0.05, 1)
+theme_override_colors/font_hover_color = Color(0.05, 0.04, 0.02, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_val_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_val_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_val_btn")
+text = "CONSIGNER CETTE TRANSMISSION AU REGISTRE DE GUERRE"
