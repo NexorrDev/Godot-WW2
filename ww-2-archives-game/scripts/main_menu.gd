@@ -24,26 +24,13 @@ signal game_started
 @onready var label_fov_val: Label = %LabelFovVal
 @onready var check_head_bob: CheckBox = %CheckHeadBob
 
-var normal_style: StyleBoxEmpty
-var hover_style: StyleBoxFlat
 var buttons: Array[Button] = []
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	
-	normal_style = StyleBoxEmpty.new()
-	
-	hover_style = StyleBoxFlat.new()
-	hover_style.bg_color = Color(0.85, 0.81, 0.74, 1.0) # Fond papier beige/parchemin
-	hover_style.corner_radius_top_left = 2
-	hover_style.corner_radius_top_right = 2
-	hover_style.corner_radius_bottom_right = 2
-	hover_style.corner_radius_bottom_left = 2
-	hover_style.content_margin_left = 12.0
-	hover_style.content_margin_right = 16.0
-	hover_style.content_margin_top = 4.0
-	hover_style.content_margin_bottom = 4.0
-	
+
+	_style_visuals()
+
 	buttons = [btn_new_game, btn_continue, btn_settings, btn_credits, btn_quit]
 	
 	for btn in buttons:
@@ -66,6 +53,32 @@ func _ready() -> void:
 		close_settings_btn.pressed.connect(func(): settings_panel.visible = false)
 
 	_setup_settings()
+
+## Habillage visuel (bandeau papier, polices, vignette, animation d'entrée).
+## Le style est partagé avec le menu pause via UIStyle.
+func _style_visuals() -> void:
+	var container: Control = $MenuRoot/LeftMenuContainer
+	var title_panel: PanelContainer = $MenuRoot/LeftMenuContainer/TitleBox/TitlePanel
+	var title_label: Label = $MenuRoot/LeftMenuContainer/TitleBox/TitlePanel/TitleLabel
+	var subtitle_label: Label = $MenuRoot/LeftMenuContainer/SubtitleLabel
+
+	UIStyle.style_title(title_panel, title_label, 46)
+	UIStyle.style_subtitle(subtitle_label)
+
+	# Vignette sous tout le reste de l'interface
+	var vignette := UIStyle.make_vignette()
+	menu_root.add_child(vignette)
+	menu_root.move_child(vignette, 0)
+
+	UIStyle.add_footer(menu_root, "ÉTAT-MAJOR GÉNÉRAL // REGISTRE DE GUERRE 1939-1945")
+
+	# Petite animation d'entrée : le bloc de menu glisse et apparaît
+	var base_x: float = container.position.x
+	container.modulate.a = 0.0
+	container.position.x = base_x - 40.0
+	var tw := create_tween().set_parallel(true)
+	tw.tween_property(container, "modulate:a", 1.0, 0.7).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tw.tween_property(container, "position:x", base_x, 0.7).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 func _setup_settings() -> void:
 	# 1. Plein écran
@@ -106,25 +119,8 @@ func _on_button_hover(target_btn: Button) -> void:
 		_apply_style(btn, btn == target_btn)
 
 func _apply_style(btn: Button, is_selected: bool) -> void:
-	var original_text = btn.get_meta("original_text", "")
-	if original_text == "":
-		original_text = btn.text.replace("▶ ", "").strip_edges()
-		btn.set_meta("original_text", original_text)
-	
-	if is_selected:
-		btn.text = "▶  " + original_text
-		btn.add_theme_stylebox_override("normal", hover_style)
-		btn.add_theme_stylebox_override("hover", hover_style)
-		btn.add_theme_stylebox_override("focus", hover_style)
-		btn.add_theme_color_override("font_color", Color(0.12, 0.12, 0.12))
-		btn.add_theme_color_override("font_hover_color", Color(0.12, 0.12, 0.12))
-	else:
-		btn.text = "    " + original_text
-		btn.add_theme_stylebox_override("normal", normal_style)
-		btn.add_theme_stylebox_override("hover", normal_style)
-		btn.add_theme_stylebox_override("focus", normal_style)
-		btn.add_theme_color_override("font_color", Color(0.78, 0.76, 0.72))
-		btn.add_theme_color_override("font_hover_color", Color(0.95, 0.93, 0.88))
+	# "Continuer" est grisé tant qu'il n'y a pas de sauvegarde (comme sur la maquette)
+	UIStyle.style_menu_button(btn, is_selected, btn == btn_continue)
 
 func _on_new_game_pressed() -> void:
 	var tween = create_tween()

@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://diu7ms6dkb6uw"]
+[gd_scene load_steps=25 format=3 uid="uid://diu7ms6dkb6uw"]
 
 [ext_resource type="Script" path="res://scripts/main_game.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/player.gd" id="2_player"]
@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" path="res://scenes/enigmas/enigma_radio.tscn" id="10_enigma_radio"]
 [ext_resource type="Script" path="res://scripts/note_item.gd" id="11_note_item"]
 [ext_resource type="PackedScene" path="res://scenes/hud_progression.tscn" id="12_hud"]
+[ext_resource type="PackedScene" path="res://scenes/pause_menu.tscn" id="13_pause"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 sky_top_color = Color(0.4, 0.5, 0.65, 1)
@@ -231,3 +232,5 @@ horizontal_alignment = 1
 [node name="DocumentViewer" parent="." instance=ExtResource("6_doc_viewer")]
 
 [node name="MainMenu" parent="." instance=ExtResource("5_menu")]
+
+[node name="PauseMenu" parent="." instance=ExtResource("13_pause")]
