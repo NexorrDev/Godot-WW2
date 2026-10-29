@@ -77,6 +77,7 @@ func open_pause() -> void:
 	_select(buttons[0])
 
 	visible = true
+	Sfx.play("pause")
 	get_tree().paused = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	get_tree().call_group("player", "pause_control")
@@ -89,6 +90,7 @@ func close_pause() -> void:
 		return
 	is_open = false
 	_close_popups()
+	Sfx.play("pause", -4.0)
 
 	get_tree().paused = false
 	get_tree().call_group("player", "resume_control")

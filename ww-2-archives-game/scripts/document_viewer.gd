@@ -64,6 +64,7 @@ func open_document(date_id: String) -> void:
 	summary_label.text = summary.replace("[b]", "[b][color=%s]" % KEYWORD_COLOR).replace("[/b]", "[/color][/b]")
 
 	visible = true
+	Sfx.play("paper_open")
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	get_tree().call_group("player", "pause_control")
 
@@ -86,6 +87,7 @@ func close_document() -> void:
 	if not is_open:
 		return
 	is_open = false
+	Sfx.play("paper_close")
 
 	var tween = create_tween()
 	tween.tween_property(root_control, "modulate:a", 0.0, 0.18)

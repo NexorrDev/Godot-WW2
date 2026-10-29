@@ -23,6 +23,7 @@ var head_bob_enabled: bool = true
 
 var default_cam_pos: Vector3
 var bob_timer: float = 0.0
+var step_distance: float = 1.0 # Distance parcourue depuis le dernier bruit de pas
 var current_interactable: Interactable = null
 
 func _ready() -> void:
@@ -103,7 +104,17 @@ func _physics_process(delta: float) -> void:
 		velocity.z = move_toward(velocity.z, 0, speed)
 
 	move_and_slide()
-	
+
+	# Bruits de pas (indépendants du balancement de marche)
+	var walk_speed := Vector2(velocity.x, velocity.z).length()
+	if is_on_floor() and walk_speed > 0.5:
+		step_distance += walk_speed * delta
+		if step_distance >= 1.25:
+			step_distance = 0.0
+			Sfx.play("step", -7.0, 0.06)
+	else:
+		step_distance = 1.0
+
 	# Balancement de marche
 	_handle_head_bob(delta, input_dir)
 	

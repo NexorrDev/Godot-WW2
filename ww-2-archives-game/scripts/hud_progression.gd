@@ -49,6 +49,8 @@ func _ready() -> void:
 	GameManager.date_unlocked.connect(_on_date_unlocked)
 	GameManager.period_changed.connect(_on_period_changed)
 	GameManager.game_loaded.connect(_on_game_loaded)
+	# Les bannières attendent que la fiche ouverte soit refermée
+	_connect_viewer.call_deferred()
 
 	_update_display(false)
 
@@ -100,13 +102,13 @@ func _on_date_unlocked(date_id: String, date_info: Dictionary) -> void:
 		return
 	seen_dates.append(date_id)
 
-	_update_display(true)
+	_update_display(false)
 
 	var count: int = GameManager.get_unlocked_count()
 	var period: int = int(date_info.get("period", 1))
 	var date_str: String = str(date_info.get("date_str", "")).to_upper()
 	var title: String = str(date_info.get("title", "Nouvelle archive")).to_upper()
-	_enqueue_toast("ARCHIVE CLASSÉE  ·  %02d/%d" % [count, TOTAL], "%s — %s" % [date_str, title], UIStyle.period_color(period))
+	_enqueue_toast("ARCHIVE CLASSÉE  ·  %02d/%d" % [count, TOTAL], "%s — %s" % [date_str, title], UIStyle.period_color(period), count - 1)
 
 ## Après un chargement : les archives déjà classées ne déclenchent plus de bannière
 func _on_game_loaded() -> void:
@@ -128,13 +130,17 @@ func _on_period_changed(new_period: int) -> void:
 # Bannières (file d'attente)
 # ---------------------------------------------------------------------------
 
-func _enqueue_toast(caption: String, title: String, accent: Color) -> void:
-	toast_queue.append({"caption": caption, "title": title, "accent": accent})
+func _enqueue_toast(caption: String, title: String, accent: Color, flash_index: int = -1) -> void:
+	toast_queue.append({"caption": caption, "title": title, "accent": accent, "flash": flash_index})
 	if not toast_busy:
 		_show_next_toast()
 
 func _show_next_toast() -> void:
 	if toast_queue.is_empty():
+		toast_busy = false
+		return
+	# Une fiche est ouverte : on garde la bannière en attente, elle s\'affichera à sa fermeture
+	if _document_is_open():
 		toast_busy = false
 		return
 	toast_busy = true
@@ -145,6 +151,9 @@ func _show_next_toast() -> void:
 	toast_caption.add_theme_color_override("font_color", accent)
 	toast_title.text = t["title"]
 	toast_style.border_color = accent
+	Sfx.play("stamp", -2.0)
+	if int(t.get("flash", -1)) >= 0:
+		_flash_segment(int(t["flash"]))
 
 	toast_panel.visible = true
 	toast_panel.modulate.a = 0.0
@@ -165,3 +174,32 @@ func _show_next_toast() -> void:
 		toast_panel.visible = false
 		_show_next_toast()
 	)
+
+# ---------------------------------------------------------------------------
+# Bannières retenues tant qu'une fiche est ouverte
+# ---------------------------------------------------------------------------
+
+func _document_viewer() -> Node:
+	return get_tree().get_first_node_in_group("document_viewer")
+
+func _document_is_open() -> bool:
+	var viewer := _document_viewer()
+	return viewer != null and viewer.is_open
+
+func _connect_viewer() -> void:
+	var viewer := _document_viewer()
+	if viewer and not viewer.document_closed.is_connected(_on_document_closed):
+		viewer.document_closed.connect(_on_document_closed)
+
+func _on_document_closed(_date_id: String) -> void:
+	# Petit délai pour laisser le joueur retrouver le bureau avant la bannière
+	await get_tree().create_timer(0.35).timeout
+	if not toast_busy:
+		_show_next_toast()
+
+## Le segment de l'archive qui vient d'être classée s'illumine puis reprend sa couleur
+func _flash_segment(index: int) -> void:
+	if index < 0 or index >= segments.size():
+		return
+	segments[index].color = Color.WHITE
+	create_tween().tween_property(segments[index], "color", _segment_color(index), 0.8)

@@ -72,6 +72,7 @@ func open_carnet() -> void:
 	refresh_carnet()
 
 	visible = true
+	Sfx.play("paper_open", -3.0)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	get_tree().call_group("player", "pause_control")
 
@@ -82,6 +83,7 @@ func close_carnet() -> void:
 	if not is_open:
 		return
 	is_open = false
+	Sfx.play("paper_close", -3.0)
 
 	var tween = create_tween()
 	tween.tween_property(root_control, "modulate:a", 0.0, 0.15)

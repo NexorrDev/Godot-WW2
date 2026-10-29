@@ -85,6 +85,7 @@ func open_radio() -> void:
 
 	lock_time = 0.0
 	smooth_strength = 0.0
+	Sfx.duck_ambient(true) # l'ambiance du bureau s'efface pour laisser entendre la radio
 	audio_player.play()
 	playback = audio_player.get_stream_playback() as AudioStreamGeneratorPlayback
 	set_process(true)
@@ -97,6 +98,7 @@ func close_radio() -> void:
 		return
 	is_open = false
 	set_process(false)
+	Sfx.duck_ambient(false)
 	audio_player.stop()
 	playback = null
 
@@ -204,6 +206,7 @@ func _trigger_broadcast_reception() -> void:
 func _on_validate_pressed() -> void:
 	close_radio()
 	# Débloque l'archive officielle et ouvre la fiche de cours
-	GameManager.unlock_date("declaration_guerre_1939")
+	# La fiche débloque elle-même la date à son ouverture : la bannière d'archive
+	# n'apparaîtra donc qu'à la fermeture du dossier.
 	get_tree().call_group("document_viewer", "open_document", "declaration_guerre_1939")
 	puzzle_completed.emit()

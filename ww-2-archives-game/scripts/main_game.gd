@@ -8,6 +8,8 @@ extends Node3D
 @onready var hud: CanvasLayer = $HUDProgression
 
 func _ready() -> void:
+	# Démarre les sons (ambiance de bureau, clics de boutons...)
+	Sfx.ensure()
 	if main_menu:
 		main_menu.game_started.connect(_on_game_started)
 
