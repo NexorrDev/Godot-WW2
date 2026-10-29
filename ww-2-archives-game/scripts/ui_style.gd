@@ -13,6 +13,7 @@ const TEXT_HOVER := Color(0.95, 0.93, 0.88, 1.0)
 const TEXT_DIM := Color(0.50, 0.48, 0.44, 1.0)
 const SUBTITLE := Color(0.72, 0.69, 0.64, 1.0)
 const FOOTER := Color(0.55, 0.52, 0.47, 1.0)
+const GOLD := Color(0.95, 0.82, 0.48, 1.0)
 
 static var _font_title: SystemFont = null
 static var _font_mono: SystemFont = null
@@ -230,6 +231,46 @@ static func add_footer(parent: Control, text: String) -> Label:
 	l.offset_right = 760.0
 	l.offset_bottom = -28.0
 	return l
+
+# ---------------------------------------------------------------------------
+# Curseur (cadran de la radio) : piste visible + gros bouton rond doré
+# ---------------------------------------------------------------------------
+
+static func make_knob(diameter: int, fill: Color, border: Color) -> ImageTexture:
+	var img := Image.create(diameter, diameter, false, Image.FORMAT_RGBA8)
+	var c: float = (diameter - 1) / 2.0
+	var r: float = diameter / 2.0
+	for y in diameter:
+		for x in diameter:
+			var d: float = Vector2(x - c, y - c).length()
+			var col := Color(0, 0, 0, 0)
+			if d <= r - 3.0:
+				col = fill
+			elif d <= r - 0.5:
+				col = border
+			img.set_pixel(x, y, col)
+	return ImageTexture.create_from_image(img)
+
+static func style_slider(s: HSlider) -> void:
+	var track := StyleBoxFlat.new()
+	track.bg_color = Color(0.05, 0.04, 0.03, 1)
+	track.set_corner_radius_all(4)
+	track.set_border_width_all(1)
+	track.border_color = Color(0.45, 0.36, 0.22, 1)
+	track.content_margin_top = 5.0
+	track.content_margin_bottom = 5.0
+	var fill := StyleBoxFlat.new()
+	fill.bg_color = Color(0.68, 0.50, 0.24, 1)
+	fill.set_corner_radius_all(4)
+	fill.content_margin_top = 5.0
+	fill.content_margin_bottom = 5.0
+	s.add_theme_stylebox_override("slider", track)
+	s.add_theme_stylebox_override("grabber_area", fill)
+	s.add_theme_stylebox_override("grabber_area_highlight", fill)
+	var knob := make_knob(28, GOLD, Color(0.35, 0.25, 0.10, 1))
+	s.add_theme_icon_override("grabber", knob)
+	s.add_theme_icon_override("grabber_highlight", knob)
+	s.add_theme_icon_override("grabber_disabled", knob)
 
 # ---------------------------------------------------------------------------
 # Fenêtres contextuelles (identiques à celles du menu principal)

@@ -1,12 +1,20 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://scripts/document_viewer.gd" id="1_viewer"]
 
-[sub_resource type="SystemFont" id="SystemFont_typewriter"]
-font_names = PackedStringArray("Courier New", "Consolas", "Courier", "monospace")
+[sub_resource type="SystemFont" id="SystemFont_mono"]
+font_names = PackedStringArray("JetBrains Mono", "Consolas", "Courier New", "Courier", "monospace")
 font_weight = 600
 
+[sub_resource type="SystemFont" id="SystemFont_title"]
+font_names = PackedStringArray("Bebas Neue", "Oswald", "Impact", "Haettenschweiler", "Arial Narrow", "sans-serif")
+font_weight = 700
+
 [sub_resource type="SystemFont" id="SystemFont_serif"]
+font_names = PackedStringArray("Georgia", "Times New Roman", "serif")
+font_weight = 400
+
+[sub_resource type="SystemFont" id="SystemFont_serif_bold"]
 font_names = PackedStringArray("Georgia", "Times New Roman", "serif")
 font_weight = 700
 
@@ -57,7 +65,7 @@ border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color(0.78, 0.20, 0.15, 0.85)
+border_color = Color(0.70, 0.16, 0.12, 0.9)
 corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
@@ -67,30 +75,16 @@ content_margin_top = 6.0
 content_margin_right = 12.0
 content_margin_bottom = 6.0
 
-[sub_resource type="LabelSettings" id="LabelSettings_stamp"]
-font = SubResource("SystemFont_typewriter")
-font_size = 11
-font_color = Color(0.78, 0.20, 0.15, 0.9)
-
-[sub_resource type="LabelSettings" id="LabelSettings_gqg"]
-font = SubResource("SystemFont_serif")
-font_size = 11
-font_color = Color(0.35, 0.30, 0.25, 1)
-
-[sub_resource type="LabelSettings" id="LabelSettings_period"]
-font = SubResource("SystemFont_typewriter")
-font_size = 12
-font_color = Color(0.45, 0.38, 0.30, 1)
-
-[sub_resource type="LabelSettings" id="LabelSettings_title"]
-font = SubResource("SystemFont_typewriter")
-font_size = 20
-font_color = Color(0.12, 0.10, 0.08, 1)
-
-[sub_resource type="LabelSettings" id="LabelSettings_meta"]
-font = SubResource("SystemFont_typewriter")
-font_size = 13
-font_color = Color(0.25, 0.22, 0.18, 1)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vocab"]
+bg_color = Color(0.91, 0.87, 0.77, 1)
+border_width_left = 5
+border_color = Color(0.55, 0.15, 0.10, 1)
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_btn"]
 bg_color = Color(0.24, 0.20, 0.16, 1)
@@ -143,7 +137,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.04, 0.04, 0.04, 0.8)
+color = Color(0.04, 0.04, 0.04, 0.82)
 
 [node name="Center" type="CenterContainer" parent="RootControl"]
 layout_mode = 1
@@ -154,34 +148,33 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="DossierWrapper" type="VBoxContainer" parent="RootControl/Center"]
-custom_minimum_size = Vector2(800, 0)
+custom_minimum_size = Vector2(940, 0)
 layout_mode = 2
 theme_override_constants/separation = 0
 
 [node name="FolderTab" type="PanelContainer" parent="RootControl/Center/DossierWrapper"]
-custom_minimum_size = Vector2(280, 26)
+custom_minimum_size = Vector2(320, 28)
 layout_mode = 2
 size_flags_horizontal = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_folder_tab")
 
 [node name="TabLabel" type="Label" parent="RootControl/Center/DossierWrapper/FolderTab"]
 layout_mode = 2
-theme_override_fonts/font = SubResource("SystemFont_typewriter")
-theme_override_font_sizes/font_size = 11
-theme_override_colors/font_color = Color(0.96, 0.94, 0.88, 1)
+theme_override_colors/font_color = Color(0.98, 0.96, 0.90, 1)
+theme_override_fonts/font = SubResource("SystemFont_mono")
+theme_override_font_sizes/font_size = 13
 text = "DOSSIER ARCHIVE MILITAIRE // CLASSIFIÉ"
 
 [node name="ManilaPanel" type="PanelContainer" parent="RootControl/Center/DossierWrapper"]
-custom_minimum_size = Vector2(800, 560)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_folder_manila")
 
 [node name="ManilaMargin" type="MarginContainer" parent="RootControl/Center/DossierWrapper/ManilaPanel"]
 layout_mode = 2
-theme_override_constants/margin_left = 18
-theme_override_constants/margin_top = 18
-theme_override_constants/margin_right = 18
-theme_override_constants/margin_bottom = 18
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
 
 [node name="PaperPanel" type="PanelContainer" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin"]
 layout_mode = 2
@@ -189,14 +182,14 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_paper")
 
 [node name="PaperMargin" type="MarginContainer" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel"]
 layout_mode = 2
-theme_override_constants/margin_left = 32
-theme_override_constants/margin_top = 28
-theme_override_constants/margin_right = 32
-theme_override_constants/margin_bottom = 24
+theme_override_constants/margin_left = 36
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 36
+theme_override_constants/margin_bottom = 22
 
 [node name="VBox" type="VBoxContainer" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 9
 
 [node name="TopHeaderHBox" type="HBoxContainer" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox"]
 layout_mode = 2
@@ -204,29 +197,33 @@ layout_mode = 2
 [node name="OfficialVBox" type="VBoxContainer" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/TopHeaderHBox"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 2
+theme_override_constants/separation = 3
 
 [node name="GqgLabel" type="Label" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/TopHeaderHBox/OfficialVBox"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.30, 0.26, 0.22, 1)
+theme_override_fonts/font = SubResource("SystemFont_serif_bold")
+theme_override_font_sizes/font_size = 13
 text = "COMMANDEMENT DES FORCES ARMÉES • ÉTAT-MAJOR GÉNÉRAL"
-label_settings = SubResource("LabelSettings_gqg")
 
 [node name="PeriodLabel" type="Label" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/TopHeaderHBox/OfficialVBox"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_colors/font_color = Color(0.36, 0.29, 0.20, 1)
+theme_override_fonts/font = SubResource("SystemFont_mono")
+theme_override_font_sizes/font_size = 14
 text = "PÉRIODE 1 : LES VICTOIRES DE L'AXE (1939-1941)"
-label_settings = SubResource("LabelSettings_period")
 
 [node name="RefLabel" type="Label" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/TopHeaderHBox/OfficialVBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_fonts/font = SubResource("SystemFont_typewriter")
-theme_override_font_sizes/font_size = 11
-theme_override_colors/font_color = Color(0.55, 0.48, 0.40, 1)
+theme_override_colors/font_color = Color(0.45, 0.39, 0.32, 1)
+theme_override_fonts/font = SubResource("SystemFont_mono")
+theme_override_font_sizes/font_size = 12
 text = "RÉFÉRENCE : GQG/ARCH-POLOGNE_1939"
 
 [node name="StampContainer" type="Control" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/TopHeaderHBox"]
-custom_minimum_size = Vector2(210, 56)
+custom_minimum_size = Vector2(240, 60)
 layout_mode = 2
 
 [node name="StampPanel" type="PanelContainer" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/TopHeaderHBox/StampContainer"]
@@ -236,10 +233,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -100.0
-offset_top = -26.0
-offset_right = 100.0
-offset_bottom = 26.0
+offset_left = -108.0
+offset_top = -27.0
+offset_right = 108.0
+offset_bottom = 27.0
 grow_horizontal = 2
 grow_vertical = 2
 rotation = -0.08
@@ -247,52 +244,116 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_stamp")
 
 [node name="StampText" type="Label" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/TopHeaderHBox/StampContainer/StampPanel"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.70, 0.16, 0.12, 1)
+theme_override_fonts/font = SubResource("SystemFont_mono")
+theme_override_font_sizes/font_size = 12
 text = "★ SECRET DÉFENSE ★
 DÉCLASSIFIÉ POUR LES ARCHIVES"
-label_settings = SubResource("LabelSettings_stamp")
 horizontal_alignment = 1
 
 [node name="HSeparator1" type="HSeparator" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox"]
 layout_mode = 2
 
+[node name="ObjetCaption" type="Label" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.38, 0.30, 1)
+theme_override_fonts/font = SubResource("SystemFont_mono")
+theme_override_font_sizes/font_size = 12
+text = "OBJET DU DOSSIER"
+
 [node name="TitleLabel" type="Label" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "OBJET : INVASION DU TERRITOIRE POLONAIS (BLITZKRIEG)"
-label_settings = SubResource("LabelSettings_title")
-autowrap_mode = 2
+theme_override_colors/font_color = Color(0.10, 0.08, 0.06, 1)
+theme_override_fonts/font = SubResource("SystemFont_title")
+theme_override_font_sizes/font_size = 34
+text = "INVASION DU TERRITOIRE POLONAIS (BLITZKRIEG)"
+autowrap_mode = 3
 
-[node name="MetaBox" type="VBoxContainer" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox"]
+[node name="MetaGrid" type="GridContainer" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 4
+columns = 2
 
-[node name="DateLabel" type="Label" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/MetaBox"]
+[node name="DateCaption" type="Label" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/MetaGrid"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.45, 0.38, 0.30, 1)
+theme_override_fonts/font = SubResource("SystemFont_mono")
+theme_override_font_sizes/font_size = 12
+text = "DATE OFFICIELLE"
+
+[node name="DateLabel" type="Label" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/MetaGrid"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "DATE OFFICIELLE : 1er Septembre 1939"
-label_settings = SubResource("LabelSettings_meta")
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.10, 0.08, 0.06, 1)
+theme_override_fonts/font = SubResource("SystemFont_serif_bold")
+theme_override_font_sizes/font_size = 19
+text = "1er Septembre 1939"
 
-[node name="LocationLabel" type="Label" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/MetaBox"]
+[node name="LocationCaption" type="Label" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/MetaGrid"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.45, 0.38, 0.30, 1)
+theme_override_fonts/font = SubResource("SystemFont_mono")
+theme_override_font_sizes/font_size = 12
+text = "THÉÂTRE DES OPÉRATIONS"
+
+[node name="LocationLabel" type="Label" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/MetaGrid"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "THÉÂTRE DES OPÉRATIONS : Pologne (frontière germano-polonaise, Varsovie)"
-label_settings = SubResource("LabelSettings_meta")
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.10, 0.08, 0.06, 1)
+theme_override_fonts/font = SubResource("SystemFont_serif_bold")
+theme_override_font_sizes/font_size = 19
+text = "Pologne (frontière germano-polonaise, Varsovie)"
+autowrap_mode = 3
 
 [node name="HSeparator2" type="HSeparator" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox"]
 layout_mode = 2
 
 [node name="SummaryLabel" type="RichTextLabel" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 160)
+custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_colors/default_color = Color(0.12, 0.10, 0.08, 1)
-theme_override_fonts/normal_font = SubResource("SystemFont_typewriter")
-theme_override_fonts/bold_font = SubResource("SystemFont_typewriter")
-theme_override_font_sizes/normal_font_size = 15
-theme_override_font_sizes/bold_font_size = 15
+theme_override_colors/default_color = Color(0.10, 0.08, 0.06, 1)
+theme_override_constants/line_separation = 6
+theme_override_fonts/normal_font = SubResource("SystemFont_serif")
+theme_override_fonts/bold_font = SubResource("SystemFont_serif_bold")
+theme_override_font_sizes/normal_font_size = 21
+theme_override_font_sizes/bold_font_size = 21
 bbcode_enabled = true
 text = "Explication historique détaillée avec le vocabulaire officiel..."
+
+[node name="VocabPanel" type="PanelContainer" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_vocab")
+
+[node name="VocabVBox" type="VBoxContainer" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/VocabPanel"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="VocabCaption" type="Label" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/VocabPanel/VocabVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.38, 0.30, 1)
+theme_override_fonts/font = SubResource("SystemFont_mono")
+theme_override_font_sizes/font_size = 12
+text = "VOCABULAIRE À RETENIR"
+
+[node name="VocabLabel" type="Label" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/VocabPanel/VocabVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.48, 0.12, 0.08, 1)
+theme_override_fonts/font = SubResource("SystemFont_serif_bold")
+theme_override_font_sizes/font_size = 19
+text = "Wehrmacht  •  Blitzkrieg"
+autowrap_mode = 3
 
 [node name="ButtonBox" type="HBoxContainer" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox"]
 layout_mode = 2
@@ -300,12 +361,12 @@ alignment = 1
 
 [node name="CloseButton" type="Button" parent="RootControl/Center/DossierWrapper/ManilaPanel/ManilaMargin/PaperPanel/PaperMargin/VBox/ButtonBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(440, 42)
+custom_minimum_size = Vector2(500, 46)
 layout_mode = 2
-theme_override_fonts/font = SubResource("SystemFont_typewriter")
-theme_override_font_sizes/font_size = 14
 theme_override_colors/font_color = Color(0.96, 0.93, 0.85, 1)
 theme_override_colors/font_hover_color = Color(1, 0.95, 0.85, 1)
+theme_override_fonts/font = SubResource("SystemFont_mono")
+theme_override_font_sizes/font_size = 15
 theme_override_styles/normal = SubResource("StyleBoxFlat_close_btn")
 theme_override_styles/hover = SubResource("StyleBoxFlat_close_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_close_btn")
