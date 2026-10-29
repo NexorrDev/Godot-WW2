@@ -18,7 +18,8 @@ const AMBIENT_RATE: int = 16000
 const AMBIENT_DB: float = -32.0
 const AMBIENT_DUCKED_DB: float = -44.0
 const POOL_SIZE: int = 10
-const STEP_VARIANTS: int = 5
+const STEP_VARIANTS: int = 5  # variantes synthétisées, utilisées seulement si les vrais pas manquent
+const STEP_DIR: String = "res://assets/sounds/footsteps/"
 
 static var instance: Sfx = null
 
@@ -27,6 +28,8 @@ var pool: Array[AudioStreamPlayer] = []
 var ambient: AudioStreamPlayer
 var duck_tween: Tween = null
 var rng := RandomNumberGenerator.new()
+var step_count: int = 0      # nombre de variantes de pas disponibles
+var last_step: int = -1      # pour ne jamais rejouer deux fois le même pas de suite
 
 # ---------------------------------------------------------------------------
 # API statique
@@ -105,7 +108,7 @@ func _hook_button(btn: BaseButton) -> void:
 func _play(sound: String, volume_db: float, pitch_var: float) -> void:
 	var key := sound
 	if sound == "step":
-		key = "step%d" % rng.randi_range(0, STEP_VARIANTS - 1)
+		key = "step%d" % _next_step()
 	if not sounds.has(key):
 		return
 	var player: AudioStreamPlayer = null
@@ -137,9 +140,35 @@ func _build_sounds() -> void:
 	sounds["paper_close"] = _make_wav(_gen_paper(0.3, 0.45))
 	sounds["stamp"] = _make_wav(_gen_stamp())
 	sounds["pause"] = _make_wav(_gen_thud(0.3, 95.0, 0.7))
-	for i in STEP_VARIANTS:
-		sounds["step%d" % i] = _make_wav(_gen_step())
+	_build_steps()
 	sounds["room_tone"] = _make_wav(_gen_room_tone(), AMBIENT_RATE, true)
+
+## Vrais enregistrements de pas (assets/sounds/footsteps/step_01.wav, step_02.wav...).
+## Si le dossier est absent, on retombe sur des pas synthétisés (moins réalistes).
+func _build_steps() -> void:
+	step_count = 0
+	for i in range(1, 100):
+		var path := "%sstep_%02d.wav" % [STEP_DIR, i]
+		if not ResourceLoader.exists(path):
+			break
+		var stream = load(path)
+		if stream is AudioStream:
+			sounds["step%d" % step_count] = stream
+			step_count += 1
+	if step_count == 0:
+		push_warning("[Sfx] Sons de pas introuvables dans %s : pas synthétisés utilisés" % STEP_DIR)
+		for i in STEP_VARIANTS:
+			sounds["step%d" % i] = _make_wav(_gen_step())
+		step_count = STEP_VARIANTS
+
+func _next_step() -> int:
+	if step_count <= 1:
+		return 0
+	var i := rng.randi_range(0, step_count - 1)
+	if i == last_step:
+		i = (i + 1 + rng.randi_range(0, step_count - 2)) % step_count
+	last_step = i
+	return i
 
 func _make_wav(data: PackedFloat32Array, rate: int = RATE, loop: bool = false) -> AudioStreamWAV:
 	var bytes := PackedByteArray()
