@@ -109,9 +109,9 @@ func _physics_process(delta: float) -> void:
 	var walk_speed := Vector2(velocity.x, velocity.z).length()
 	if is_on_floor() and walk_speed > 0.5:
 		step_distance += walk_speed * delta
-		if step_distance >= 1.25:
+		if step_distance >= 1.4:
 			step_distance = 0.0
-			Sfx.play("step", -7.0, 0.06)
+			Sfx.play("step", -11.0, 0.05)
 	else:
 		step_distance = 1.0
 

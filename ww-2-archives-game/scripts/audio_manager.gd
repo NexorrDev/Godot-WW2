@@ -8,24 +8,23 @@ class_name Sfx
 ## - papier : ouverture / fermeture des fiches et du carnet
 ## - stamp : tampon quand une archive est classée
 ## - pause : ouverture / fermeture du menu pause
-## - step : bruits de pas (appelé par le joueur)
-## - ambiance de bureau en boucle (ronronnement + horloge qui s'arrête pendant la pause)
+## - step : bruits de pas sur plancher, talon puis pointe (appelé par le joueur)
+## - ambiance de bureau très discrète en boucle (souffle grave, sans note continue ni tic-tac)
 ##
 ## Le nœud se crée tout seul au premier appel (Sfx.ensure()), aucun Autoload à déclarer.
 
 const RATE: int = 22050
 const AMBIENT_RATE: int = 16000
-const AMBIENT_DB: float = -21.0
-const AMBIENT_DUCKED_DB: float = -34.0
+const AMBIENT_DB: float = -32.0
+const AMBIENT_DUCKED_DB: float = -44.0
 const POOL_SIZE: int = 10
+const STEP_VARIANTS: int = 5
 
 static var instance: Sfx = null
 
 var sounds: Dictionary = {}
 var pool: Array[AudioStreamPlayer] = []
 var ambient: AudioStreamPlayer
-var tick_timer: Timer
-var tick_flip: bool = false
 var duck_tween: Tween = null
 var rng := RandomNumberGenerator.new()
 
@@ -75,14 +74,6 @@ func _ready() -> void:
 	add_child(ambient)
 	ambient.play()
 
-	# L'horloge s'arrête quand le jeu est en pause
-	tick_timer = Timer.new()
-	tick_timer.wait_time = 1.0
-	tick_timer.process_mode = Node.PROCESS_MODE_PAUSABLE
-	tick_timer.timeout.connect(_on_tick)
-	add_child(tick_timer)
-	tick_timer.start()
-
 	# Tous les boutons, présents ou à venir, font du bruit
 	get_tree().node_added.connect(_on_node_added)
 	_hook_existing(get_tree().root)
@@ -107,10 +98,6 @@ func _hook_button(btn: BaseButton) -> void:
 			_play("hover", -9.0, 0.03)
 	)
 
-func _on_tick() -> void:
-	tick_flip = not tick_flip
-	_play("tock" if tick_flip else "tick", -17.0, 0.0)
-
 # ---------------------------------------------------------------------------
 # Lecture
 # ---------------------------------------------------------------------------
@@ -118,7 +105,7 @@ func _on_tick() -> void:
 func _play(sound: String, volume_db: float, pitch_var: float) -> void:
 	var key := sound
 	if sound == "step":
-		key = "step%d" % rng.randi_range(0, 2)
+		key = "step%d" % rng.randi_range(0, STEP_VARIANTS - 1)
 	if not sounds.has(key):
 		return
 	var player: AudioStreamPlayer = null
@@ -150,11 +137,8 @@ func _build_sounds() -> void:
 	sounds["paper_close"] = _make_wav(_gen_paper(0.3, 0.45))
 	sounds["stamp"] = _make_wav(_gen_stamp())
 	sounds["pause"] = _make_wav(_gen_thud(0.3, 95.0, 0.7))
-	sounds["tick"] = _make_wav(_gen_tick(2400.0))
-	sounds["tock"] = _make_wav(_gen_tick(1750.0))
-	sounds["step0"] = _make_wav(_gen_step(80.0))
-	sounds["step1"] = _make_wav(_gen_step(90.0))
-	sounds["step2"] = _make_wav(_gen_step(100.0))
+	for i in STEP_VARIANTS:
+		sounds["step%d" % i] = _make_wav(_gen_step())
 	sounds["room_tone"] = _make_wav(_gen_room_tone(), AMBIENT_RATE, true)
 
 func _make_wav(data: PackedFloat32Array, rate: int = RATE, loop: bool = false) -> AudioStreamWAV:
@@ -239,32 +223,49 @@ func _gen_thud(duration: float, freq: float, gain: float) -> PackedFloat32Array:
 		d[i] = sin(TAU * freq * t) * exp(-t * 18.0) * gain + lp * exp(-t * 40.0) * 0.3
 	return d
 
-## Tic / tac de l'horloge murale
-func _gen_tick(freq: float) -> PackedFloat32Array:
-	var n := int(RATE * 0.045)
+## Pas sur un plancher : un talon (choc sourd + petit "toc" médium) puis la pointe, plus douce.
+## Uniquement du bruit filtré, sans note pure : pas de côté creux ni métallique.
+func _gen_step() -> PackedFloat32Array:
+	var n := int(RATE * 0.30)
 	var d := PackedFloat32Array()
 	d.resize(n)
-	var lp := 0.0
-	for i in n:
-		var t := float(i) / RATE
+	
+	var toe_delay := int(RATE * rng.randf_range(0.075, 0.105))
+	var heel_gain := rng.randf_range(0.85, 1.0)
+	var toe_gain := rng.randf_range(0.35, 0.55)
+	var body_a := rng.randf_range(0.035, 0.055)   # fréquence de coupure du choc sourd (~120 à 190 Hz)
+	
+	_add_footfall(d, 0, heel_gain, body_a, 1.0)
+	_add_footfall(d, toe_delay, toe_gain, body_a * 1.25, 0.7)
+	
+	# Normalisation douce : tous les pas ont le même niveau de crête
+	var peak := 0.0
+	for v in d:
+		peak = maxf(peak, absf(v))
+	if peak > 0.0:
+		for i in n:
+			d[i] = d[i] / peak * 0.8
+	return d
+
+func _add_footfall(d: PackedFloat32Array, start: int, gain: float, body_a: float, knock: float) -> void:
+	var lp1 := 0.0
+	var lp2 := 0.0
+	var mid_lo := 0.0
+	var mid_hi := 0.0
+	for i in range(start, d.size()):
+		var t := float(i - start) / RATE
 		var w := _white()
-		lp += (w - lp) * 0.5
-		d[i] = (w - lp) * exp(-t * 260.0) * 0.6 + sin(TAU * freq * t) * exp(-t * 200.0) * 0.25
-	return d
+		# Corps : bruit filtré deux fois vers le grave
+		lp1 += (w - lp1) * body_a
+		lp2 += (lp1 - lp2) * body_a
+		# "Toc" médium : bande étroite autour de 300-900 Hz
+		mid_lo += (w - mid_lo) * 0.11
+		mid_hi += (w - mid_hi) * 0.035
+		var mid := mid_lo - mid_hi
+		var attack := 1.0 - exp(-t * 1200.0)
+		d[i] += attack * (lp2 * 4.5 * exp(-t * 32.0) + mid * knock * 3.4 * exp(-t * 52.0)) * gain
 
-## Pas étouffé sur un plancher
-func _gen_step(freq: float) -> PackedFloat32Array:
-	var n := int(RATE * 0.18)
-	var d := PackedFloat32Array()
-	d.resize(n)
-	var lp := 0.0
-	for i in n:
-		var t := float(i) / RATE
-		lp += (_white() - lp) * 0.12
-		d[i] = sin(TAU * freq * t) * exp(-t * 28.0) * 0.8 + lp * exp(-t * 35.0) * 0.45
-	return d
-
-## Ambiance de bureau : ronronnement électrique + souffle grave.
+## Ambiance de bureau : simple souffle grave et doux (aucune note continue, aucun tic-tac).
 ## Toutes les fréquences font un nombre entier de cycles sur la boucle : aucun "clic" au raccord.
 func _gen_room_tone() -> PackedFloat32Array:
 	var duration := 2.0
@@ -275,13 +276,13 @@ func _gen_room_tone() -> PackedFloat32Array:
 	var freqs := PackedFloat32Array()
 	var phases := PackedFloat32Array()
 	for k in 24:
-		freqs.append(float(rng.randi_range(200, 900)) / duration)  # 100 à 450 Hz
+		freqs.append(float(rng.randi_range(120, 560)) / duration)  # 60 à 280 Hz
 		phases.append(rng.randf() * TAU)
 
 	for i in n:
 		var t := float(i) / AMBIENT_RATE
-		var v := sin(TAU * 50.0 * t) * 0.05 + sin(TAU * 100.0 * t) * 0.03 + sin(TAU * 150.0 * t) * 0.012
+		var v := 0.0
 		for j in freqs.size():
-			v += sin(TAU * freqs[j] * t + phases[j]) * 0.004
+			v += sin(TAU * freqs[j] * t + phases[j]) * 0.006
 		d[i] = v
 	return d
