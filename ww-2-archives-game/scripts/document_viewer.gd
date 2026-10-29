@@ -92,5 +92,12 @@ func close_document() -> void:
 	await tween.finished
 	visible = false
 
-	get_tree().call_group("player", "resume_control")
+	# Si la fiche a été ouverte depuis le carnet (TAB), le carnet est toujours à l'écran :
+	# on garde la souris visible et le joueur bloqué, sinon la souris disparaît.
+	var carnets = get_tree().get_nodes_in_group("carnet_archives")
+	var carnet_open = carnets.size() > 0 and carnets[0].is_open
+	if carnet_open:
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	else:
+		get_tree().call_group("player", "resume_control")
 	document_closed.emit(current_date_id)

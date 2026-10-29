@@ -1,80 +1,45 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/hud_progression.gd" id="1_hud"]
 
-[sub_resource type="SystemFont" id="SystemFont_typewriter"]
-font_names = PackedStringArray("Courier New", "Consolas", "Courier", "monospace")
+[sub_resource type="SystemFont" id="SystemFont_mono"]
+font_names = PackedStringArray("JetBrains Mono", "Consolas", "Courier New", "Courier", "monospace")
 font_weight = 600
 
+[sub_resource type="SystemFont" id="SystemFont_title"]
+font_names = PackedStringArray("Bebas Neue", "Oswald", "Impact", "Haettenschweiler", "Arial Narrow", "sans-serif")
+font_weight = 700
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_badge"]
-bg_color = Color(0.12, 0.10, 0.08, 0.92)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.70, 0.55, 0.32, 0.95)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-content_margin_left = 14.0
-content_margin_top = 10.0
-content_margin_right = 14.0
-content_margin_bottom = 10.0
-shadow_color = Color(0, 0, 0, 0.75)
-shadow_size = 14
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_prog_bg"]
-bg_color = Color(0.06, 0.05, 0.04, 1)
-corner_radius_top_left = 2
-corner_radius_top_right = 2
-corner_radius_bottom_right = 2
-corner_radius_bottom_left = 2
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_prog_fill"]
-bg_color = Color(0.92, 0.75, 0.35, 1)
-corner_radius_top_left = 2
-corner_radius_top_right = 2
-corner_radius_bottom_right = 2
-corner_radius_bottom_left = 2
-
-[sub_resource type="LabelSettings" id="LabelSettings_badge_header"]
-font = SubResource("SystemFont_typewriter")
-font_size = 10
-font_color = Color(0.72, 0.65, 0.50, 1)
-
-[sub_resource type="LabelSettings" id="LabelSettings_badge_counter"]
-font = SubResource("SystemFont_typewriter")
-font_size = 14
-font_color = Color(0.98, 0.85, 0.45, 1)
+bg_color = Color(0.09, 0.08, 0.07, 0.78)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.55, 0.46, 0.30, 0.65)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+shadow_color = Color(0, 0, 0, 0.5)
+shadow_size = 6
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_toast"]
-bg_color = Color(0.14, 0.11, 0.08, 0.98)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.90, 0.75, 0.40, 1)
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
-content_margin_left = 24.0
-content_margin_top = 10.0
-content_margin_right = 24.0
+bg_color = Color(0.10, 0.09, 0.08, 0.94)
+border_width_left = 5
+border_color = Color(0.93, 0.83, 0.45, 1)
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+content_margin_left = 20.0
+content_margin_top = 9.0
+content_margin_right = 22.0
 content_margin_bottom = 10.0
-shadow_color = Color(0, 0, 0, 0.85)
-shadow_size = 20
-
-[sub_resource type="LabelSettings" id="LabelSettings_toast_title"]
-font = SubResource("SystemFont_typewriter")
-font_size = 12
-font_color = Color(0.95, 0.80, 0.40, 1)
-
-[sub_resource type="LabelSettings" id="LabelSettings_toast_sub"]
-font = SubResource("SystemFont_typewriter")
-font_size = 13
-font_color = Color(0.96, 0.94, 0.88, 1)
+shadow_color = Color(0, 0, 0, 0.7)
+shadow_size = 14
 
 [node name="HUDProgression" type="CanvasLayer"]
 layer = 8
@@ -93,52 +58,38 @@ mouse_filter = 2
 unique_name_in_owner = true
 layout_mode = 1
 offset_left = 20.0
-offset_top = 20.0
-offset_right = 320.0
-offset_bottom = 128.0
+offset_top = 18.0
+offset_right = 20.0
+offset_bottom = 18.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_badge")
 
-[node name="BadgeVBox" type="VBoxContainer" parent="RootControl/BadgePanel"]
+[node name="BadgeHBox" type="HBoxContainer" parent="RootControl/BadgePanel"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 5
+theme_override_constants/separation = 12
 
-[node name="HeaderLabel" type="Label" parent="RootControl/BadgePanel/BadgeVBox"]
-layout_mode = 2
-text = "ÉTAT-MAJOR // REGISTRE DE GUERRE"
-label_settings = SubResource("LabelSettings_badge_header")
-
-[node name="CounterLabel" type="Label" parent="RootControl/BadgePanel/BadgeVBox"]
+[node name="CounterLabel" type="Label" parent="RootControl/BadgePanel/BadgeHBox"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "ARCHIVES IDENTIFIÉES : 0 / 15"
-label_settings = SubResource("LabelSettings_badge_counter")
+theme_override_colors/font_color = Color(0.98, 0.85, 0.45, 1)
+theme_override_fonts/font = SubResource("SystemFont_mono")
+theme_override_font_sizes/font_size = 16
+text = "00/15"
 
-[node name="ProgressBar" type="ProgressBar" parent="RootControl/BadgePanel/BadgeVBox"]
+[node name="SegmentsBox" type="HBoxContainer" parent="RootControl/BadgePanel/BadgeHBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 7)
 layout_mode = 2
+size_flags_vertical = 4
 mouse_filter = 2
-theme_override_styles/background = SubResource("StyleBoxFlat_prog_bg")
-theme_override_styles/fill = SubResource("StyleBoxFlat_prog_fill")
-max_value = 15.0
-show_percentage = false
+theme_override_constants/separation = 3
 
-[node name="PeriodLabel" type="Label" parent="RootControl/BadgePanel/BadgeVBox"]
-unique_name_in_owner = true
+[node name="HintLabel" type="Label" parent="RootControl/BadgePanel/BadgeHBox"]
 layout_mode = 2
-theme_override_fonts/font = SubResource("SystemFont_typewriter")
+theme_override_colors/font_color = Color(0.62, 0.57, 0.48, 1)
+theme_override_fonts/font = SubResource("SystemFont_mono")
 theme_override_font_sizes/font_size = 11
-theme_override_colors/font_color = Color(0.85, 0.78, 0.65, 1)
-text = "PÉRIODE 1 : LES VICTOIRES DE L'AXE (1939-1941)"
-
-[node name="HintLabel" type="Label" parent="RootControl/BadgePanel/BadgeVBox"]
-layout_mode = 2
-theme_override_fonts/font = SubResource("SystemFont_typewriter")
-theme_override_font_sizes/font_size = 10
-theme_override_colors/font_color = Color(0.60, 0.54, 0.44, 1)
-text = "[TOUCHE TAB] OUVRIR LE CARNET COMPLET"
+text = "[TAB]"
 
 [node name="ToastPanel" type="PanelContainer" parent="RootControl"]
 unique_name_in_owner = true
@@ -147,10 +98,10 @@ layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -330.0
+offset_left = -270.0
 offset_top = 20.0
-offset_right = 330.0
-offset_bottom = 86.0
+offset_right = 270.0
+offset_bottom = 74.0
 grow_horizontal = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_toast")
@@ -158,26 +109,20 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_toast")
 [node name="ToastVBox" type="VBoxContainer" parent="RootControl/ToastPanel"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 3
+theme_override_constants/separation = 0
+
+[node name="ToastCaption" type="Label" parent="RootControl/ToastPanel/ToastVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.93, 0.83, 0.45, 1)
+theme_override_fonts/font = SubResource("SystemFont_mono")
+theme_override_font_sizes/font_size = 11
+text = "ARCHIVE CLASSÉE  ·  01/15"
 
 [node name="ToastTitle" type="Label" parent="RootControl/ToastPanel/ToastVBox"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "[ ARCHIVE MILITAIRE CLASSÉE // 1 / 15 ]"
-label_settings = SubResource("LabelSettings_toast_title")
-horizontal_alignment = 1
-
-[node name="ToastSubtitle" type="Label" parent="RootControl/ToastPanel/ToastVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "1ER SEPTEMBRE 1939 : INVASION DE LA POLOGNE"
-label_settings = SubResource("LabelSettings_toast_sub")
-horizontal_alignment = 1
-
-[node name="ToastHint" type="Label" parent="RootControl/ToastPanel/ToastVBox"]
-layout_mode = 2
-theme_override_fonts/font = SubResource("SystemFont_typewriter")
-theme_override_font_sizes/font_size = 10
-theme_override_colors/font_color = Color(0.70, 0.62, 0.45, 1)
-text = "APPUYEZ SUR LA TOUCHE [TAB] POUR CONSULTER LE REGISTRE"
-horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.96, 0.94, 0.88, 1)
+theme_override_fonts/font = SubResource("SystemFont_title")
+theme_override_font_sizes/font_size = 24
+text = "1ER SEPTEMBRE 1939 — INVASION DE LA POLOGNE"

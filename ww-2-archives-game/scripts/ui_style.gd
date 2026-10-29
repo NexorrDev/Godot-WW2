@@ -15,6 +15,16 @@ const SUBTITLE := Color(0.72, 0.69, 0.64, 1.0)
 const FOOTER := Color(0.55, 0.52, 0.47, 1.0)
 const GOLD := Color(0.95, 0.82, 0.48, 1.0)
 
+## Couleur propre à chaque période (bleu / orange / or), utilisée par le HUD
+static func period_color(period: int) -> Color:
+	match period:
+		1:
+			return Color(0.50, 0.68, 0.92)
+		2:
+			return Color(0.95, 0.66, 0.34)
+		_:
+			return Color(0.93, 0.83, 0.45)
+
 static var _font_title: SystemFont = null
 static var _font_mono: SystemFont = null
 
