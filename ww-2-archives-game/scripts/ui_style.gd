@@ -152,6 +152,7 @@ static func style_menu_button(btn: Button, selected: bool, dimmed: bool = false)
 		color = TEXT_DIM
 	btn.add_theme_color_override("font_color", color)
 	btn.add_theme_color_override("font_focus_color", color)
+	btn.add_theme_color_override("font_disabled_color", TEXT_DIM)
 	btn.add_theme_color_override("font_pressed_color", color)
 	btn.add_theme_color_override("font_hover_color", INK if selected else TEXT_HOVER)
 	btn.add_theme_color_override("font_hover_pressed_color", INK if selected else TEXT_HOVER)

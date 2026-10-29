@@ -48,6 +48,7 @@ func _ready() -> void:
 	# Connexions aux signaux du GameManager
 	GameManager.date_unlocked.connect(_on_date_unlocked)
 	GameManager.period_changed.connect(_on_period_changed)
+	GameManager.game_loaded.connect(_on_game_loaded)
 
 	_update_display(false)
 
@@ -107,8 +108,18 @@ func _on_date_unlocked(date_id: String, date_info: Dictionary) -> void:
 	var title: String = str(date_info.get("title", "Nouvelle archive")).to_upper()
 	_enqueue_toast("ARCHIVE CLASSÉE  ·  %02d/%d" % [count, TOTAL], "%s — %s" % [date_str, title], UIStyle.period_color(period))
 
+## Après un chargement : les archives déjà classées ne déclenchent plus de bannière
+func _on_game_loaded() -> void:
+	seen_dates.clear()
+	for id in GameManager.unlocked_dates:
+		seen_dates.append(id)
+	toast_queue.clear()
+	_update_display(false)
+
 func _on_period_changed(new_period: int) -> void:
 	_update_display(false)
+	if GameManager.is_loading:
+		return
 	# Le retour à la période 1 (nouvelle partie) n'a pas besoin d'annonce
 	if new_period > 1:
 		_enqueue_toast("NOUVELLE PÉRIODE", PERIOD_NAMES.get(new_period, ""), UIStyle.period_color(new_period))

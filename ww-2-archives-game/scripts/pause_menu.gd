@@ -365,7 +365,7 @@ func _build_confirm_panel() -> void:
 	vbox.add_child(_popup_title("RETOUR AU MENU"))
 	vbox.add_child(HSeparator.new())
 
-	var msg := _popup_label("La progression de cette session sera perdue.\nRetourner au menu principal ?", 15, Color(0.9, 0.9, 0.9, 1))
+	var msg := _popup_label("Votre progression est sauvegardée automatiquement.\nRetourner au menu principal ?", 15, Color(0.9, 0.9, 0.9, 1))
 	msg.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(msg)
 

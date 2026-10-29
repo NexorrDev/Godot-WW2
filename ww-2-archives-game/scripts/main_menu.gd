@@ -31,6 +31,12 @@ func _ready() -> void:
 
 	_style_visuals()
 
+	# "Continuer" n'est actif que s'il existe une sauvegarde ; il indique alors la progression
+	var saved_count: int = GameManager.get_saved_count()
+	btn_continue.disabled = saved_count == 0
+	if saved_count > 0:
+		btn_continue.text = "Continuer  %02d/%d" % [saved_count, GameManager.TOTAL_DATES]
+
 	buttons = [btn_new_game, btn_continue, btn_settings, btn_credits, btn_quit]
 	
 	for btn in buttons:
@@ -42,7 +48,7 @@ func _ready() -> void:
 	_apply_style(btn_new_game, true)
 	
 	btn_new_game.pressed.connect(_on_new_game_pressed)
-	btn_continue.pressed.connect(_on_new_game_pressed)
+	btn_continue.pressed.connect(_on_continue_pressed)
 	btn_settings.pressed.connect(func(): settings_panel.visible = true)
 	btn_credits.pressed.connect(func(): credits_panel.visible = true)
 	btn_quit.pressed.connect(func(): get_tree().quit())
@@ -115,14 +121,29 @@ func _setup_settings() -> void:
 		)
 
 func _on_button_hover(target_btn: Button) -> void:
+	if target_btn.disabled:
+		return
 	for btn in buttons:
 		_apply_style(btn, btn == target_btn)
 
 func _apply_style(btn: Button, is_selected: bool) -> void:
 	# "Continuer" est grisé tant qu'il n'y a pas de sauvegarde (comme sur la maquette)
-	UIStyle.style_menu_button(btn, is_selected, btn == btn_continue)
+	# Texte de base mémorisé de nouveau si le bouton a changé de libellé (ex. "Continuer  04/15")
+	UIStyle.style_menu_button(btn, is_selected, btn.disabled)
 
 func _on_new_game_pressed() -> void:
+	# Une nouvelle partie remplace l'ancienne sauvegarde
+	GameManager.delete_save()
+	GameManager.reset_game()
+	_start_game()
+
+func _on_continue_pressed() -> void:
+	if not GameManager.load_game():
+		# Sauvegarde illisible : on repart de zéro plutôt que de bloquer le joueur
+		GameManager.reset_game()
+	_start_game()
+
+func _start_game() -> void:
 	var tween = create_tween()
 	tween.tween_property(menu_root, "modulate:a", 0.0, 0.35)
 	await tween.finished

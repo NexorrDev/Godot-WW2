@@ -5,6 +5,12 @@ class_name RadioItem
 ## Lorsqu'on interagit avec, il ouvre l'interface de syntonisation sur la BBC (390 kHz).
 
 func _ready() -> void:
+	_refresh_prompt()
+	# Le message change dès que la date est trouvée ou qu'une sauvegarde est chargée
+	GameManager.date_unlocked.connect(func(_id, _info): _refresh_prompt())
+	GameManager.game_loaded.connect(_refresh_prompt)
+
+func _refresh_prompt() -> void:
 	prompt_message = "Syntoniser : Poste de radio T.S.F."
 	# Écoute si la date 2 a déjà été trouvée
 	if GameManager.is_date_unlocked("declaration_guerre_1939"):
