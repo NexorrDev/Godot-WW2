@@ -111,7 +111,7 @@ func _physics_process(delta: float) -> void:
 		step_distance += walk_speed * delta
 		if step_distance >= 1.4:
 			step_distance = 0.0
-			Sfx.play("step", -8.0, 0.04)
+			Sfx.play("step", -12.0, 0.04)
 	else:
 		step_distance = 1.0
 
