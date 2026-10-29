@@ -24,6 +24,7 @@ const MIX_RATE: float = 22050.0
 @onready var transcript_panel: PanelContainer = %TranscriptPanel
 @onready var transcript_text: RichTextLabel = %TranscriptText
 @onready var validate_button: Button = %ValidateButton
+@onready var dial_panel: PanelContainer = $RootControl/ChassisPanel/VBox/DialPanel
 @onready var close_button: Button = %CloseButton
 
 var is_open: bool = false
@@ -36,6 +37,7 @@ var playback: AudioStreamGeneratorPlayback = null
 var signal_strength: float = 0.0   # 0..1 selon la proximité de 390 kHz
 var smooth_strength: float = 0.0   # version lissée (évite les à-coups dans le son)
 var lock_time: float = 0.0         # temps passé dans la zone d'accord
+var solved_fade: float = 0.0   # 0 -> 1 après l'accord : le grésillement s'éteint complètement
 var crackle_env: float = 0.0
 var lp_state: float = 0.0
 var hum_phase: float = 0.0
@@ -86,8 +88,11 @@ func open_radio() -> void:
 	lock_time = 0.0
 	smooth_strength = 0.0
 	Sfx.duck_ambient(true) # l'ambiance du bureau s'efface pour laisser entendre la radio
-	audio_player.play()
-	playback = audio_player.get_stream_playback() as AudioStreamGeneratorPlayback
+	if is_solved and solved_fade >= 1.0:
+		playback = null # fréquence déjà trouvée : silence, plus aucun grésillement
+	else:
+		audio_player.play()
+		playback = audio_player.get_stream_playback() as AudioStreamGeneratorPlayback
 	set_process(true)
 
 	var tween = create_tween()
@@ -129,6 +134,15 @@ func _process(delta: float) -> void:
 		return
 
 	smooth_strength = lerpf(smooth_strength, signal_strength, clampf(delta * 8.0, 0.0, 1.0))
+	
+	# Fréquence trouvée : le grésillement s'éteint en fondu, puis le son est coupé
+	if is_solved:
+		solved_fade = minf(1.0, solved_fade + delta / 0.45)
+		if solved_fade >= 1.0:
+			if audio_player.playing:
+				audio_player.stop()
+			playback = null
+			return
 
 	# Il faut rester dans la zone d'accord un petit moment pour capter l'émission
 	var distance: float = abs(current_frequency - TARGET_FREQ)
@@ -154,12 +168,13 @@ func _fill_audio() -> void:
 
 	var s: float = smooth_strength
 	var lock: float = clampf(lock_time / LOCK_TIME_REQUIRED, 0.0, 1.0)
+	var live: float = 1.0 - solved_fade
 
-	var hiss_amp: float = 0.015 + 0.10 * s
+	var hiss_amp: float = (0.015 + 0.10 * s) * live
 	var crackle_rate: float = 0.00004 + 0.0035 * s * s  # probabilité de claquement par échantillon
-	var crackle_amp: float = 0.15 + 0.55 * s
+	var crackle_amp: float = (0.15 + 0.55 * s) * live
 	var noise_mult: float = 1.0 - 0.75 * lock
-	var hum_amp: float = 0.10 * lock
+	var hum_amp: float = 0.10 * lock * live
 	var hum_step: float = TAU * 140.0 / MIX_RATE
 
 	var buf := PackedVector2Array()
@@ -185,6 +200,11 @@ func _fill_audio() -> void:
 
 func _trigger_broadcast_reception() -> void:
 	is_solved = true
+	Sfx.play("click", -6.0) # petit déclic : la station est verrouillée
+	# Le cadran ne sert plus : il s'efface pour laisser toute la place au texte
+	var dial_tween = create_tween()
+	dial_tween.tween_property(dial_panel, "modulate:a", 0.0, 0.3)
+	dial_tween.tween_callback(func(): dial_panel.visible = false)
 	transcript_panel.visible = true
 	validate_button.visible = true
 	signal_status_label.text = "[SIGNAL SYNTONISÉ] TRANSMISSION BBC HOME SERVICE EN DIRECT (LONDRES)"
