@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://diu7ms6dkb6uw"]
+[gd_scene load_steps=31 format=3 uid="uid://diu7ms6dkb6uw"]
 
 [ext_resource type="Script" path="res://scripts/main_game.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/player.gd" id="2_player"]
@@ -10,7 +10,6 @@
 [ext_resource type="PackedScene" path="res://scenes/carnet_archives.tscn" id="8_carnet"]
 [ext_resource type="Script" path="res://scripts/radio_item.gd" id="9_radio_item"]
 [ext_resource type="PackedScene" path="res://scenes/enigmas/enigma_radio.tscn" id="10_enigma_radio"]
-[ext_resource type="Script" path="res://scripts/note_item.gd" id="11_note_item"]
 [ext_resource type="PackedScene" path="res://scenes/hud_progression.tscn" id="12_hud"]
 [ext_resource type="PackedScene" path="res://scenes/pause_menu.tscn" id="13_pause"]
 
@@ -75,16 +74,6 @@ size = Vector3(0.5, 0.35, 0.28)
 
 [sub_resource type="BoxMesh" id="BoxMesh_radio"]
 size = Vector3(0.5, 0.35, 0.28)
-
-[sub_resource type="StandardMaterial3D" id="Mat_Note"]
-albedo_color = Color(0.92, 0.89, 0.8, 1)
-roughness = 0.9
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_note"]
-size = Vector3(0.25, 0.05, 0.2)
-
-[sub_resource type="BoxMesh" id="BoxMesh_note"]
-size = Vector3(0.22, 0.01, 0.16)
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 radius = 0.4
@@ -158,19 +147,6 @@ shape = SubResource("BoxShape3D_radio")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Poste_Radio"]
 mesh = SubResource("BoxMesh_radio")
 surface_material_override/0 = SubResource("Mat_RadioWood")
-
-[node name="Note_Radio" type="StaticBody3D" parent="."]
-transform = Transform3D(0.984808, 0, 0.173648, 0, 1, 0, -0.173648, 0, 0.984808, 1.65, 0.71, 0.2)
-script = ExtResource("11_note_item")
-prompt_message = "Lire l'ordre d'écoute : Fréquence BBC 390 kHz"
-note_text = "ORDRE D'ÉCOUTE PRIORITAIRE — 3 SEPTEMBRE 1939 : Syntoniser la radio militaire sur 390 kHz (BBC Londres)."
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Note_Radio"]
-shape = SubResource("BoxShape3D_note")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Note_Radio"]
-mesh = SubResource("BoxMesh_note")
-surface_material_override/0 = SubResource("Mat_Note")
 
 [node name="Joueur" type="CharacterBody3D" parent="."]
 transform = Transform3D(0.951056, 0, -0.309017, 0, 1, 0, 0.309017, 0, 0.951056, -0.5, 0, 2.4)

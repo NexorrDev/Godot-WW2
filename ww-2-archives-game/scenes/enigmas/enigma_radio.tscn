@@ -257,17 +257,6 @@ text = "150 kHz (Paris PTT)"
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="LblBBC" type="Label" parent="RootControl/ChassisPanel/VBox/DialPanel/DialVBox/ScaleLabelsHBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.95, 0.80, 0.45, 1)
-theme_override_fonts/font = SubResource("SystemFont_mono")
-theme_override_font_sizes/font_size = 13
-text = "[ 390 kHz • BBC LONDRES ]"
-
-[node name="Spacer2" type="Control" parent="RootControl/ChassisPanel/VBox/DialPanel/DialVBox/ScaleLabelsHBox"]
-layout_mode = 2
-size_flags_horizontal = 3
-
 [node name="Lbl550" type="Label" parent="RootControl/ChassisPanel/VBox/DialPanel/DialVBox/ScaleLabelsHBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.74, 0.64, 0.50, 1)
