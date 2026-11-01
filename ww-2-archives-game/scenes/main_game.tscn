@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://diu7ms6dkb6uw"]
+[gd_scene load_steps=36 format=3 uid="uid://diu7ms6dkb6uw"]
 
 [ext_resource type="Script" path="res://scripts/main_game.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/office_room.gd" id="14_room"]
@@ -6,7 +6,10 @@
 [ext_resource type="Script" path="res://scripts/test_box.gd" id="4_box"]
 [ext_resource type="PackedScene" uid="uid://cxo7n82k0m3v1" path="res://scenes/main_menu.tscn" id="5_menu"]
 [ext_resource type="PackedScene" uid="uid://bwh7l6u4vxqkm" path="res://scenes/document_viewer.tscn" id="6_doc_viewer"]
-[ext_resource type="Script" path="res://scripts/document_item.gd" id="7_doc_item"]
+[ext_resource type="Script" path="res://scripts/sealed_document_item.gd" id="7_doc_item"]
+[ext_resource type="Script" path="res://scripts/tool_item.gd" id="15_tool"]
+[ext_resource type="Script" path="res://scripts/carte_item.gd" id="16_carte"]
+[ext_resource type="Script" path="res://scripts/enigmas/enigma_carte.gd" id="17_enigma_carte"]
 [ext_resource type="PackedScene" path="res://scenes/carnet_archives.tscn" id="8_carnet"]
 [ext_resource type="Script" path="res://scripts/radio_item.gd" id="9_radio_item"]
 [ext_resource type="PackedScene" path="res://scenes/enigmas/enigma_radio.tscn" id="10_enigma_radio"]
@@ -43,6 +46,42 @@ size = Vector3(0.5, 0.35, 0.28)
 [sub_resource type="BoxMesh" id="BoxMesh_radio"]
 size = Vector3(0.5, 0.35, 0.28)
 
+[sub_resource type="StandardMaterial3D" id="Mat_Wax"]
+albedo_color = Color(0.55, 0.06, 0.05, 1)
+roughness = 0.35
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_wax"]
+top_radius = 0.03
+bottom_radius = 0.032
+height = 0.012
+
+[sub_resource type="StandardMaterial3D" id="Mat_Blotter"]
+albedo_color = Color(0.14, 0.32, 0.18, 1)
+roughness = 0.95
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_blotter"]
+size = Vector3(0.55, 0.06, 0.38)
+
+[sub_resource type="BoxMesh" id="BoxMesh_blotter"]
+size = Vector3(0.55, 0.02, 0.38)
+
+[sub_resource type="StandardMaterial3D" id="Mat_Metal"]
+albedo_color = Color(0.72, 0.72, 0.74, 1)
+metallic = 0.8
+roughness = 0.35
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_opener"]
+size = Vector3(0.1, 0.1, 0.3)
+
+[sub_resource type="BoxMesh" id="BoxMesh_opener"]
+size = Vector3(0.025, 0.012, 0.24)
+
+[sub_resource type="BoxMesh" id="BoxMesh_scissors"]
+size = Vector3(0.07, 0.012, 0.16)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_scissors"]
+size = Vector3(0.14, 0.08, 0.22)
+
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 radius = 0.4
 height = 1.8
@@ -76,6 +115,48 @@ shape = SubResource("BoxShape3D_folder")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Dossier_Pologne"]
 mesh = SubResource("BoxMesh_folder")
 surface_material_override/0 = SubResource("Mat_Folder")
+
+[node name="Cachet" type="MeshInstance3D" parent="Dossier_Pologne"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.026, 0)
+mesh = SubResource("CylinderMesh_wax")
+surface_material_override/0 = SubResource("Mat_Wax")
+
+[node name="SousMain" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.45, 0.76, 0.62)
+script = ExtResource("16_carte")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SousMain"]
+shape = SubResource("BoxShape3D_blotter")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SousMain"]
+mesh = SubResource("BoxMesh_blotter")
+surface_material_override/0 = SubResource("Mat_Blotter")
+
+[node name="CoupePapier" type="StaticBody3D" parent="."]
+transform = Transform3D(0.94, 0, 0.34, 0, 1, 0, -0.34, 0, 0.94, 0.9, 0.762, 0.25)
+script = ExtResource("15_tool")
+tool_id = "coupe_papier"
+tool_label = "Coupe-papier"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CoupePapier"]
+shape = SubResource("BoxShape3D_opener")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CoupePapier"]
+mesh = SubResource("BoxMesh_opener")
+surface_material_override/0 = SubResource("Mat_Metal")
+
+[node name="Ciseaux" type="StaticBody3D" parent="."]
+transform = Transform3D(0.8, 0, -0.6, 0, 1, 0, 0.6, 0, 0.8, -0.95, 0.762, 0.9)
+script = ExtResource("15_tool")
+tool_id = "ciseaux"
+tool_label = "Ciseaux"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ciseaux"]
+shape = SubResource("BoxShape3D_scissors")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ciseaux"]
+mesh = SubResource("BoxMesh_scissors")
+surface_material_override/0 = SubResource("Mat_Metal")
 
 [node name="Table_Radio" type="CSGBox3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.7, 0.35, 0.5)
@@ -149,6 +230,9 @@ horizontal_alignment = 1
 [node name="HUDProgression" parent="." instance=ExtResource("12_hud")]
 
 [node name="EnigmaRadio" parent="." instance=ExtResource("10_enigma_radio")]
+
+[node name="EnigmaCarte" type="CanvasLayer" parent="."]
+script = ExtResource("17_enigma_carte")
 
 [node name="CarnetArchives" parent="." instance=ExtResource("8_carnet")]
 

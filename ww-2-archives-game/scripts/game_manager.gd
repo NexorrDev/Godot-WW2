@@ -10,12 +10,17 @@ signal all_dates_completed
 ## Émis après le chargement d'une sauvegarde (le HUD et les objets se remettent à jour)
 signal game_loaded
 
+## Un objet a été ramassé (coupe-papier, ciseaux...)
+signal item_obtained(item_id: String, label: String)
+
 const DATES_PER_PERIOD: int = 5
 const TOTAL_DATES: int = 15
 const SAVE_PATH: String = "user://savegame.json"
-const SAVE_VERSION: int = 1
+const SAVE_VERSION: int = 2
 
 var unlocked_dates: Array[String] = []
+## Objets ramassés par le joueur (identifiants, ex. "coupe_papier")
+var items: Array[String] = []
 var current_period: int = 1
 ## Vrai pendant un chargement : le HUD n'affiche alors aucune bannière
 var is_loading: bool = false
@@ -51,6 +56,21 @@ func unlock_date(date_id: String) -> bool:
 	
 	return true
 
+func give_item(item_id: String, label: String = "") -> void:
+	if items.has(item_id):
+		return
+	items.append(item_id)
+	item_obtained.emit(item_id, label if label != "" else item_id)
+
+func has_item(item_id: String) -> bool:
+	return items.has(item_id)
+
+func has_any_item(ids: Array) -> bool:
+	for id in ids:
+		if items.has(id):
+			return true
+	return false
+
 func is_date_unlocked(date_id: String) -> bool:
 	return unlocked_dates.has(date_id)
 
@@ -83,6 +103,7 @@ func _set_period(new_period: int) -> void:
 ## (voir delete_save() pour une vraie nouvelle partie).
 func reset_game() -> void:
 	unlocked_dates.clear()
+	items.clear()
 	current_period = 1
 	period_changed.emit(1)
 
@@ -98,6 +119,7 @@ func save_game() -> void:
 	file.store_string(JSON.stringify({
 		"version": SAVE_VERSION,
 		"unlocked_dates": unlocked_dates,
+		"items": items,
 	}))
 
 ## Lit le fichier et renvoie les identifiants valides, ou null si aucune sauvegarde exploitable
@@ -116,6 +138,20 @@ func _read_save() -> Variant:
 			ids.append(id)
 	return ids
 
+func _read_items() -> Array[String]:
+	var out: Array[String] = []
+	if not FileAccess.file_exists(SAVE_PATH):
+		return out
+	var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
+	if file == null:
+		return out
+	var data = JSON.parse_string(file.get_as_text())
+	if data is Dictionary and data.get("items") is Array:
+		for it in data["items"]:
+			if it is String and not out.has(it):
+				out.append(it)
+	return out
+
 ## Nombre de dates de la sauvegarde (0 si aucune sauvegarde valide)
 func get_saved_count() -> int:
 	var ids = _read_save()
@@ -130,6 +166,10 @@ func load_game() -> bool:
 		return false
 	is_loading = true
 	unlocked_dates = ids
+	items.clear()
+	var saved_items = _read_items()
+	for it in saved_items:
+		items.append(it)
 	current_period = 1
 	if get_period_unlocked_count(1) >= DATES_PER_PERIOD:
 		current_period = 2

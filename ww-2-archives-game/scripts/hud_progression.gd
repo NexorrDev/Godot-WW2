@@ -130,6 +130,10 @@ func _on_period_changed(new_period: int) -> void:
 # Bannières (file d'attente)
 # ---------------------------------------------------------------------------
 
+## Petit message d'information (objet ramassé, indice...)
+func show_info(caption: String, title: String) -> void:
+	_enqueue_toast(caption, title, UIStyle.GOLD)
+
 func _enqueue_toast(caption: String, title: String, accent: Color, flash_index: int = -1) -> void:
 	toast_queue.append({"caption": caption, "title": title, "accent": accent, "flash": flash_index})
 	if not toast_busy:
