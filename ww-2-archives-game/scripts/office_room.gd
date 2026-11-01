@@ -290,7 +290,7 @@ func _build_archives_door() -> void:
 	label.text = "ARCHIVES"
 	label.font = UIStyle.font_title()
 	label.font_size = 72
-	label.pixel_size = 0.0028
+	label.pixel_size = 0.0019
 	label.modulate = Color(0.10, 0.10, 0.10)
 	label.outline_size = 0
 	label.shaded = false

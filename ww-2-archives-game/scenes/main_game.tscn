@@ -10,6 +10,10 @@
 [ext_resource type="Script" path="res://scripts/tool_item.gd" id="15_tool"]
 [ext_resource type="Script" path="res://scripts/carte_item.gd" id="16_carte"]
 [ext_resource type="Script" path="res://scripts/enigmas/enigma_carte.gd" id="17_enigma_carte"]
+[ext_resource type="Script" path="res://scripts/pendule_item.gd" id="18_pendule"]
+[ext_resource type="Script" path="res://scripts/corbeille_item.gd" id="19_corbeille"]
+[ext_resource type="Script" path="res://scripts/note_viewer.gd" id="20_note_viewer"]
+[ext_resource type="Script" path="res://scripts/enigmas/enigma_pendule.gd" id="21_enigma_pendule"]
 [ext_resource type="PackedScene" path="res://scenes/carnet_archives.tscn" id="8_carnet"]
 [ext_resource type="Script" path="res://scripts/radio_item.gd" id="9_radio_item"]
 [ext_resource type="PackedScene" path="res://scenes/enigmas/enigma_radio.tscn" id="10_enigma_radio"]
@@ -139,6 +143,14 @@ shape = SubResource("BoxShape3D_opener")
 mesh = SubResource("BoxMesh_opener")
 surface_material_override/0 = SubResource("Mat_Metal")
 
+[node name="Pendule" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.54, 2.55, -1.1)
+script = ExtResource("18_pendule")
+
+[node name="Corbeille" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.1, 0.2, 0.15)
+script = ExtResource("19_corbeille")
+
 [node name="Table_Radio" type="CSGBox3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.7, 0.35, 0.5)
 use_collision = true
@@ -211,6 +223,12 @@ horizontal_alignment = 1
 [node name="HUDProgression" parent="." instance=ExtResource("12_hud")]
 
 [node name="EnigmaRadio" parent="." instance=ExtResource("10_enigma_radio")]
+
+[node name="NoteViewer" type="CanvasLayer" parent="."]
+script = ExtResource("20_note_viewer")
+
+[node name="EnigmaPendule" type="CanvasLayer" parent="."]
+script = ExtResource("21_enigma_pendule")
 
 [node name="EnigmaCarte" type="CanvasLayer" parent="."]
 script = ExtResource("17_enigma_carte")
