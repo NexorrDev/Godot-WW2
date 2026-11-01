@@ -5,27 +5,24 @@ class_name OfficeRoom
 ## ceux-ci sont faits à part et se posent dans la scène principale).
 ##
 ## Contenu : sol carrelé, murs en plâtre, plafond à dalles, porte des archives (mur ouest),
-## porte d'entrée (mur sud), fenêtre à store (mur est) avec vue sur la ville, plinthes,
+## fenêtre à store (mur est) avec vue sur la ville, plinthes,
 ## éclairage et ambiance qui changent avec la période (nuit / aube / jour).
 ##
-## Repère : x vers l'est, z vers le sud. La pièce fait 6 m (x) sur 5,4 m (z), 3 m sous plafond.
-## Le fond de la pièce (étagères, classeurs verts, tableau en liège) est le mur nord (z = -2,7).
+## Repère : x vers l'est, z vers le sud. La pièce fait 7,2 m (x) sur 6,6 m (z), 3 m sous plafond.
+## Le fond de la pièce (étagères, classeurs verts, tableau en liège) est le mur nord (z = -3,3).
 ## Tout se règle avec les constantes ci-dessous.
 
-const HALF_W: float = 3.0
-const HALF_D: float = 2.7
+const HALF_W: float = 3.6
+const HALF_D: float = 3.3
 const H: float = 3.0
 const T: float = 0.25                # épaisseur des murs
 
 # Porte des archives (mur ouest, verrouillée jusqu'à la date 14)
-const ARCH_DOOR_Z: float = -0.9
+const ARCH_DOOR_Z: float = -1.1
 const ARCH_DOOR_W: float = 1.0
 const DOOR_H: float = 2.1
-# Porte d'entrée (mur sud)
-const ENTRY_X: float = 0.0
-const ENTRY_W: float = 1.0
 # Fenêtre (mur est)
-const WIN_Z: float = -1.85
+const WIN_Z: float = -2.3
 const WIN_W: float = 1.5
 const WIN_Y0: float = 0.85
 const WIN_Y1: float = 2.4
@@ -231,7 +228,7 @@ func _build_structure() -> void:
 	var fw := HALF_W * 2.0 + T * 2.0
 	var fd := HALF_D * 2.0 + T * 2.0
 	_box("Sol", Vector3(0, -0.1, 0), Vector3(fw, 0.2, fd), mats["floor"])
-	_box("Tapis", Vector3(0, 0.006, 0.45), Vector3(2.9, 0.012, 2.2), mats["rug"], false)
+	_box("Tapis", Vector3(0, 0.006, 0.6), Vector3(3.3, 0.012, 2.6), mats["rug"], false)
 	var ceiling := _box("Plafond", Vector3(0, H + T / 2.0, 0), Vector3(fw, T, fd), mats["ceiling"])
 	ceiling.add_to_group("room_ceiling")
 
@@ -244,14 +241,9 @@ func _build_structure() -> void:
 	_wall_z(-1, -HALF_W - T, HALF_W + T, 0.0, H)
 	_baseboard_z(-1, -HALF_W, HALF_W)
 
-	# Mur sud : porte d'entrée
-	var ex0 := ENTRY_X - ENTRY_W / 2.0
-	var ex1 := ENTRY_X + ENTRY_W / 2.0
-	_wall_z(1, -HALF_W - T, ex0, 0.0, H)
-	_wall_z(1, ex1, HALF_W + T, 0.0, H)
-	_wall_z(1, ex0, ex1, DOOR_H, H)
-	_baseboard_z(1, -HALF_W, ex0)
-	_baseboard_z(1, ex1, HALF_W)
+	# Mur sud : plein (pas de porte d'entrée)
+	_wall_z(1, -HALF_W - T, HALF_W + T, 0.0, H)
+	_baseboard_z(1, -HALF_W, HALF_W)
 
 	# Mur ouest : porte des archives
 	var az0 := ARCH_DOOR_Z - ARCH_DOOR_W / 2.0
@@ -278,7 +270,6 @@ func _build_structure() -> void:
 
 func _build_openings() -> void:
 	_build_archives_door()
-	_build_entry_door()
 	_build_window()
 
 func _build_archives_door() -> void:
@@ -309,16 +300,6 @@ func _build_archives_door() -> void:
 	add_child(label)
 
 	_box("Poignee_Archives", Vector3(x_in + 0.05, 1.0, z1 - 0.12), Vector3(0.05, 0.04, 0.14), mats["metal"], false)
-
-func _build_entry_door() -> void:
-	var z_in := HALF_D
-	var x0 := ENTRY_X - ENTRY_W / 2.0
-	var x1 := ENTRY_X + ENTRY_W / 2.0
-	_box("Chambranle_A", Vector3(x0 - 0.03, DOOR_H / 2.0, z_in - 0.03), Vector3(0.07, DOOR_H, 0.07), mats["wood"])
-	_box("Chambranle_B", Vector3(x1 + 0.03, DOOR_H / 2.0, z_in - 0.03), Vector3(0.07, DOOR_H, 0.07), mats["wood"])
-	_box("Chambranle_Haut", Vector3(ENTRY_X, DOOR_H + 0.03, z_in - 0.03), Vector3(ENTRY_W + 0.14, 0.07, 0.07), mats["wood"])
-	_box("Porte_Entree", Vector3(ENTRY_X, DOOR_H / 2.0, z_in + 0.06), Vector3(ENTRY_W - 0.01, DOOR_H - 0.01, 0.05), mats["wood_dark"])
-	_box("Poignee_Entree", Vector3(x1 - 0.12, 1.0, z_in - 0.0), Vector3(0.14, 0.04, 0.05), mats["metal"], false)
 
 func _build_window() -> void:
 	var x_in := HALF_W
@@ -411,7 +392,7 @@ func _build_lights() -> void:
 	# Appoint près de la fenêtre : donne la lueur de la lumière extérieure sur le mur et les meubles
 	fill = OmniLight3D.new()
 	fill.name = "Lumiere_Appoint_Fenetre"
-	fill.position = Vector3(2.1, 1.7, -1.6)
+	fill.position = Vector3(2.7, 1.7, -2.0)
 	fill.omni_range = 4.0
 	fill.omni_attenuation = 1.5
 	add_child(fill)
