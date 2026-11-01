@@ -1,0 +1,1 @@
+carte_europe_1940.png : générée à partir des données Natural Earth (domaine public, naturalearthdata.com).

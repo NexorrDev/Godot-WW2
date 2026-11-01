@@ -76,12 +76,6 @@ size = Vector3(0.1, 0.1, 0.3)
 [sub_resource type="BoxMesh" id="BoxMesh_opener"]
 size = Vector3(0.025, 0.012, 0.24)
 
-[sub_resource type="BoxMesh" id="BoxMesh_scissors"]
-size = Vector3(0.07, 0.012, 0.16)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_scissors"]
-size = Vector3(0.14, 0.08, 0.22)
-
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_player"]
 radius = 0.4
 height = 1.8
@@ -143,19 +137,6 @@ shape = SubResource("BoxShape3D_opener")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="CoupePapier"]
 mesh = SubResource("BoxMesh_opener")
-surface_material_override/0 = SubResource("Mat_Metal")
-
-[node name="Ciseaux" type="StaticBody3D" parent="."]
-transform = Transform3D(0.8, 0, -0.6, 0, 1, 0, 0.6, 0, 0.8, -0.95, 0.762, 0.9)
-script = ExtResource("15_tool")
-tool_id = "ciseaux"
-tool_label = "Ciseaux"
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Ciseaux"]
-shape = SubResource("BoxShape3D_scissors")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Ciseaux"]
-mesh = SubResource("BoxMesh_scissors")
 surface_material_override/0 = SubResource("Mat_Metal")
 
 [node name="Table_Radio" type="CSGBox3D" parent="."]

@@ -10,26 +10,15 @@ signal puzzle_completed
 const MAP_SIZE := Vector2(760, 560)
 const DATE_ID := "offensive_ouest_1940"
 const PAWN_R := 17.0
-const S := 0.76   # échelle d'affichage (la carte tient dans 720p)
+const S := 0.80   # échelle d'affichage (la carte tient dans 720p)
 const GOOD_ZONES := ["pays_bas", "belgique", "ardennes"]
 
-# Zones (coordonnées de la carte). "ok" = zone valide, sinon leurre
-const ZONES := {
-	"pays_bas": {"name": "PAYS-BAS", "color": Color(0.80, 0.70, 0.52), "label": Vector2(385, 66),
-		"poly": [Vector2(330, 40), Vector2(430, 30), Vector2(450, 90), Vector2(430, 135), Vector2(340, 130), Vector2(320, 80)]},
-	"belgique": {"name": "BELGIQUE", "color": Color(0.74, 0.74, 0.55), "label": Vector2(335, 158),
-		"poly": [Vector2(250, 140), Vector2(340, 130), Vector2(430, 135), Vector2(430, 205), Vector2(330, 215), Vector2(240, 200)]},
-	"ardennes": {"name": "ARDENNES", "color": Color(0.52, 0.62, 0.45), "label": Vector2(385, 248),
-		"poly": [Vector2(330, 215), Vector2(430, 205), Vector2(470, 260), Vector2(430, 310), Vector2(340, 305), Vector2(310, 255)]},
-	"allemagne": {"name": "ALLEMAGNE", "color": Color(0.64, 0.60, 0.55), "label": Vector2(610, 200),
-		"poly": [Vector2(460, 35), Vector2(740, 30), Vector2(740, 520), Vector2(480, 520), Vector2(500, 420), Vector2(470, 330), Vector2(430, 310), Vector2(470, 260), Vector2(430, 205), Vector2(430, 135), Vector2(450, 90)]},
-	"france": {"name": "FRANCE", "color": Color(0.70, 0.76, 0.82), "label": Vector2(190, 430),
-		"poly": [Vector2(70, 230), Vector2(240, 200), Vector2(330, 215), Vector2(310, 255), Vector2(340, 305), Vector2(430, 310), Vector2(470, 330), Vector2(500, 420), Vector2(480, 520), Vector2(60, 520), Vector2(40, 380)]},
-	"maginot": {"name": "LIGNE MAGINOT", "color": Color(0.60, 0.63, 0.70), "label": Vector2(425, 420),
-		"poly": [Vector2(430, 320), Vector2(475, 335), Vector2(500, 420), Vector2(482, 500), Vector2(440, 500), Vector2(455, 420)]},
-	"uk": {"name": "ROYAUME-UNI", "color": Color(0.74, 0.68, 0.74), "label": Vector2(125, 115),
-		"poly": [Vector2(60, 60), Vector2(170, 40), Vector2(200, 120), Vector2(150, 190), Vector2(80, 170)]},
-}
+const MAP_TEXTURE := preload("res://assets/textures/map/carte_europe_1940.png")
+# Noms affichés quand un pion est posé sur une mauvaise zone
+const ZONE_NAMES := {"maginot": "La ligne Maginot", "ardennes": "Les Ardennes", "pays_bas": "Les Pays-Bas", "belgique": "La Belgique",
+	"allemagne": "Le territoire allemand", "france": "La France", "uk": "Le Royaume-Uni"}
+# Ordre de test : les zones fines d'abord
+const HIT_ORDER := ["maginot", "ardennes", "pays_bas", "belgique", "allemagne", "france", "uk"]
 
 var is_open := false
 var is_solved := false
@@ -161,21 +150,13 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _zone_at(p: Vector2) -> String:
 	# les zones plus fines (Maginot) sont testées en premier
-	for id in ["maginot", "pays_bas", "belgique", "ardennes", "allemagne", "france", "uk"]:
-		if Geometry2D.is_point_in_polygon(p, PackedVector2Array(ZONES[id]["poly"])):
+	for id in HIT_ORDER:
+		if Geometry2D.is_point_in_polygon(p, CarteData.ZONES[id]):
 			return id
 	return ""
 
-func _zone_center(id: String) -> Vector2:
-	var c := Vector2.ZERO
-	var poly: Array = ZONES[id]["poly"]
-	for v in poly:
-		c += v
-	return c / poly.size()
-
 func _slot_pos(id: String) -> Vector2:
-	# si plusieurs pions voulaient la même zone on ne les superpose pas (une zone = un pion)
-	return _zone_center(id) + Vector2(0, 26)
+	return CarteData.SLOTS[id]
 
 func _on_canvas_input(event_in: InputEvent) -> void:
 	if is_solved:
@@ -215,7 +196,9 @@ func _drop(i: int, mouse: Vector2) -> void:
 		flash_zone = zone
 		flash_time = 0.6
 		if zone != "" and not taken:
-			status_label.text = "%s : un état-major ne perce pas ici." % ZONES[zone]["name"]
+			status_label.text = "%s : ce n'est pas là que l'attaque doit passer." % ZONE_NAMES[zone]
+		elif taken:
+			status_label.text = "Un seul pion par zone."
 		Sfx.play("click", -4.0)
 		set_process(true)
 	_update_status()
@@ -263,32 +246,35 @@ func _on_validate() -> void:
 func _draw_map() -> void:
 	canvas.draw_set_transform(Vector2.ZERO, 0.0, Vector2(S, S))
 	var font := UIStyle.font_mono()
-	canvas.draw_rect(Rect2(Vector2.ZERO, MAP_SIZE), Color(0.58, 0.72, 0.80)) # mer
-	canvas.draw_string(font, Vector2(150, 245), "LA MANCHE", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color(0.28, 0.40, 0.50))
-	canvas.draw_string(font, Vector2(245, 30), "MER DU NORD", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color(0.28, 0.40, 0.50))
-	for id in ZONES:
-		var z: Dictionary = ZONES[id]
-		var poly := PackedVector2Array(z["poly"])
-		var col: Color = z["color"]
-		if id == flash_zone:
-			col = col.lerp(Color(0.85, 0.25, 0.2), 0.6)
-		canvas.draw_colored_polygon(poly, col)
-		var closed := poly.duplicate()
-		closed.append(poly[0])
-		canvas.draw_polyline(closed, Color(0.25, 0.22, 0.18), 2.0 if id == "maginot" else 1.5)
-		var lab := Vector2(z["label"])
-		var size := 12 if id in ["pays_bas", "maginot"] else 14
-		canvas.draw_string(font, lab - Vector2(float(str(z["name"]).length()) * size * 0.3, 0), z["name"], HORIZONTAL_ALIGNMENT_LEFT, -1, size, Color(0.14, 0.12, 0.10))
-	# Paris (leurre)
-	canvas.draw_circle(Vector2(210, 330), 5, Color(0.2, 0.15, 0.1))
-	canvas.draw_string(font, Vector2(222, 334), "Paris", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color(0.14, 0.12, 0.10))
-	# Bac des pions
-	canvas.draw_rect(Rect2(540, 512, 205, 44), Color(0.14, 0.12, 0.10, 0.85))
-	canvas.draw_string(font, Vector2(548, 507), "PIONS D'ASSAUT", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, UIStyle.INK)
+	var ink := Color(0.20, 0.15, 0.10)
+	canvas.draw_texture_rect(MAP_TEXTURE, Rect2(Vector2.ZERO, MAP_SIZE), false)
+	# zone refusée : brève lueur rouge
+	if flash_zone != "" and CarteData.ZONES.has(flash_zone):
+		canvas.draw_colored_polygon(CarteData.ZONES[flash_zone], Color(0.8, 0.12, 0.08, 0.35))
+	# noms de pays et de régions
+	for l in CarteData.LABELS:
+		var name: String = l[0]
+		if name == "SUISSE":
+			continue
+		var size: int = l[2]
+		var is_sea: bool = name in ["La Manche", "Mer du Nord"]
+		var col := Color(0.25, 0.38, 0.45) if is_sea else (Color(0.45, 0.10, 0.08) if name == "LIGNE MAGINOT" else ink)
+		var w := font.get_string_size(name, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x
+		canvas.draw_string(font, l[1] - Vector2(w / 2.0, 0), name, HORIZONTAL_ALIGNMENT_LEFT, -1, size, col)
+	# villes
+	for city in CarteData.CITIES:
+		var c: Vector2 = CarteData.CITIES[city]
+		canvas.draw_circle(c, 3.0, ink)
+		canvas.draw_string(font, c + Vector2(6, 4), city, HORIZONTAL_ALIGNMENT_LEFT, -1, 10, ink)
+	# cadre de carte
+	canvas.draw_rect(Rect2(Vector2.ZERO, MAP_SIZE), Color(0.25, 0.18, 0.12), false, 3.0)
+	# bac des pions
+	canvas.draw_rect(Rect2(540, 512, 205, 44), Color(0.14, 0.12, 0.10, 0.88))
+	canvas.draw_string(font, Vector2(548, 507), "PIONS D'ASSAUT", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.95, 0.88, 0.7))
 	for i in pawns.size():
 		var p: Vector2 = pawns[i]["pos"]
 		var locked: bool = pawns[i]["locked"]
-		canvas.draw_circle(p + Vector2(2, 3), PAWN_R, Color(0, 0, 0, 0.35))
-		canvas.draw_circle(p, PAWN_R, Color(0.55, 0.12, 0.10) if not locked else Color(0.75, 0.15, 0.12))
+		canvas.draw_circle(p + Vector2(2, 3), PAWN_R, Color(0, 0, 0, 0.4))
+		canvas.draw_circle(p, PAWN_R, Color(0.75, 0.15, 0.12) if locked else Color(0.60, 0.13, 0.10))
 		canvas.draw_arc(p, PAWN_R, 0, TAU, 32, Color(0.95, 0.85, 0.6), 2.0)
 		canvas.draw_string(font, p + Vector2(-5, 5), "X", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color(0.95, 0.85, 0.6))
