@@ -56,9 +56,7 @@ var sun: DirectionalLight3D
 var lamp: OmniLight3D
 var fill: OmniLight3D
 var env: Environment
-var sky_quad: MeshInstance3D
-var sky_textures: Dictionary = {}
-var shown_sky: String = ""
+var window_view: WindowView
 var current_period: int = 1
 var period_tween: Tween = null
 
@@ -113,11 +111,9 @@ func _mix(a: Dictionary, b: Dictionary, t: float) -> void:
 	fill.light_color = fa.lerp(b["fill_color"], t)
 	fill.light_energy = lerpf(a["fill"], b["fill"], t)
 
-	# La vue par la fenêtre change à mi-parcours
-	var target_sky: String = a["sky"] if t < 0.5 else b["sky"]
-	if target_sky != shown_sky and sky_textures.has(target_sky):
-		shown_sky = target_sky
-		(sky_quad.material_override as StandardMaterial3D).albedo_texture = sky_textures[target_sky]
+	# Vue extérieure (ciel, ville, lumières des immeubles) : mélange des deux ambiances
+	if window_view:
+		window_view.apply_mix(a["sky"], b["sky"], t)
 
 # ---------------------------------------------------------------------------
 # Matériaux
@@ -398,24 +394,10 @@ func _build_lights() -> void:
 	add_child(fill)
 
 func _build_window_view() -> void:
-	for key in ["dusk", "dawn", "day"]:
-		sky_textures[key] = _tex("%s_city.png" % key)
-
-	var m := StandardMaterial3D.new()
-	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	m.cull_mode = BaseMaterial3D.CULL_DISABLED
-	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-
-	sky_quad = MeshInstance3D.new()
-	sky_quad.name = "Vue_Fenetre"
-	var q := QuadMesh.new()
-	q.size = Vector2(22.0, 11.0)
-	sky_quad.mesh = q
-	sky_quad.material_override = m
-	sky_quad.position = Vector3(HALF_W + 9.0, 3.0, WIN_Z)
-	sky_quad.rotation_degrees = Vector3(0, -90, 0)
-	sky_quad.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	add_child(sky_quad)
+	window_view = WindowView.new()
+	window_view.name = "Vue_Fenetre"
+	add_child(window_view)
+	window_view.setup(HALF_W, WIN_Z)
 
 ## Pour les captures et le débogage : cache ou montre le plafond (vue de dessus)
 func set_ceiling_visible(v: bool) -> void:
