@@ -434,29 +434,73 @@ func _add_smoke(pos: Vector3, scale: float) -> void:
 	p.mesh = q
 	add_child(p)
 
+func _tri_mesh(tris: Array) -> ArrayMesh:
+	var verts := PackedVector3Array()
+	var norms := PackedVector3Array()
+	for t in tris:
+		for v in t:
+			verts.append(v)
+			norms.append(Vector3.UP)
+	var arr := []
+	arr.resize(Mesh.ARRAY_MAX)
+	arr[Mesh.ARRAY_VERTEX] = verts
+	arr[Mesh.ARRAY_NORMAL] = norms
+	var m := ArrayMesh.new()
+	m.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr)
+	return m
+
 func _build_birds() -> void:
 	var mat := StandardMaterial3D.new()
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.albedo_color = Color(0.05, 0.05, 0.06)
+	mat.albedo_color = Color(0.04, 0.04, 0.05)
 	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
-	for i in 5:
+	mat.disable_fog = true
+	# Corps : tête vers -Z, queue en éventail vers +Z (unités : mètres, ~oiseau de 0,5 m)
+	var body := _tri_mesh([
+		[Vector3(0, 0, -0.20), Vector3(-0.045, 0, -0.04), Vector3(0.045, 0, -0.04)],
+		[Vector3(-0.045, 0, -0.04), Vector3(0.045, 0, -0.04), Vector3(0, 0, 0.16)],
+		[Vector3(0, 0, 0.10), Vector3(-0.08, 0, 0.30), Vector3(0.08, 0, 0.30)],
+		[Vector3(0, 0.03, -0.10), Vector3(-0.03, 0, -0.04), Vector3(0.03, 0, -0.04)],
+	])
+	# Aile droite (la gauche est son miroir) : bord d'attaque avancé, bout effilé et recourbé vers l'arrière
+	var wing_pts := [Vector3(0.03, 0, -0.07), Vector3(0.30, 0.02, -0.10), Vector3(0.62, 0.0, 0.08),
+		Vector3(0.40, 0, 0.16), Vector3(0.03, 0, 0.18)]
+	var wing_r := _tri_mesh([
+		[wing_pts[0], wing_pts[1], wing_pts[4]],
+		[wing_pts[1], wing_pts[3], wing_pts[4]],
+		[wing_pts[1], wing_pts[2], wing_pts[3]],
+	])
+	var wing_l := _tri_mesh([
+		[Vector3(-0.03, 0, -0.07), Vector3(-0.03, 0, 0.18), Vector3(-0.30, 0.02, -0.10)],
+		[Vector3(-0.30, 0.02, -0.10), Vector3(-0.03, 0, 0.18), Vector3(-0.40, 0, 0.16)],
+		[Vector3(-0.30, 0.02, -0.10), Vector3(-0.40, 0, 0.16), Vector3(-0.62, 0.0, 0.08)],
+	])
+	for i in 7:
 		var bird := Node3D.new()
+		bird.scale = Vector3.ONE * rng.randf_range(1.5, 2.2)
 		bird.set_meta("z0", win_z + 25.0 - i * 9.0)
 		bird.set_meta("speed", rng.randf_range(3.5, 5.0))
 		bird.set_meta("phase", rng.randf() * 6.0)
-		bird.set_meta("base_y", rng.randf_range(1.5, 6.0))
+		bird.set_meta("base_y", rng.randf_range(1.5, 7.0))
 		bird.set_meta("off", rng.randf() * 60.0)
+		bird.set_meta("rate", rng.randf_range(6.5, 9.0))
+		bird.set_meta("radius", rng.randf_range(3.5, 5.0))
+		bird.set_meta("cz", win_z + rng.randf_range(-7.0, 4.0))
+		bird.set_meta("dir", 1.0 if i % 2 == 0 else -1.0)
+		var mb := MeshInstance3D.new()
+		mb.mesh = body
+		mb.material_override = mat
+		mb.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		bird.add_child(mb)
 		for side in [-1, 1]:
-			var wing := MeshInstance3D.new()
-			var qm := QuadMesh.new()
-			qm.size = Vector2(0.5, 0.12)
-			wing.mesh = qm
-			wing.material_override = mat
-			wing.position = Vector3(0, 0, side * 0.25)
-			wing.rotation_degrees = Vector3(90, 90, 0)
-			wing.name = "Aile_%d" % side
-			wing.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-			bird.add_child(wing)
+			var hinge := Node3D.new()
+			hinge.name = "Aile_%d" % side
+			var mw := MeshInstance3D.new()
+			mw.mesh = wing_r if side > 0 else wing_l
+			mw.material_override = mat
+			mw.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			hinge.add_child(mw)
+			bird.add_child(hinge)
 		bird.visible = false
 		add_child(bird)
 		birds.append(bird)
@@ -468,13 +512,27 @@ func _process(_delta: float) -> void:
 		return
 	var t := Time.get_ticks_msec() / 1000.0
 	for b in birds:
-		var span := 130.0
-		var z := fposmod(float(b.get_meta("z0")) + float(b.get_meta("off")) - t * float(b.get_meta("speed")), span) - 75.0 + win_z
-		b.position = Vector3(x0 + 7.0 + sin(t * 0.3 + float(b.get_meta("phase"))) * 2.0, float(b.get_meta("base_y")) + sin(t * 0.7 + float(b.get_meta("phase"))) * 0.6, z)
+		var ph := float(b.get_meta("phase"))
+		# Les oiseaux tournent en rond au-dessus de la rue : on les voit de profil, de face, de dos
+		var r := float(b.get_meta("radius"))
+		var dir := float(b.get_meta("dir"))
+		var sp := float(b.get_meta("speed"))
+		var ang := ph + dir * t * sp / r
+		var cx := x0 + 13.5
+		var cz := float(b.get_meta("cz"))
+		var y := float(b.get_meta("base_y")) + 1.5 + sin(t * 0.7 + ph) * 0.6
+		b.position = Vector3(cx + cos(ang) * r, y, cz + sin(ang) * r)
 		b.visible = true
-		var flap := sin(t * 11.0 + float(b.get_meta("phase"))) * 35.0
-		(b.get_node("Aile_-1") as Node3D).rotation_degrees = Vector3(90 + flap, 90, 0)
-		(b.get_node("Aile_1") as Node3D).rotation_degrees = Vector3(90 - flap, 90, 0)
+		var vx := -sin(ang) * dir
+		var vz := cos(ang) * dir
+		b.rotation = Vector3(0, atan2(-vx, -vz), dir * 0.45)
+		# Battements par salves, puis plané ailes ouvertes
+		var rate := float(b.get_meta("rate"))
+		var burst := clampf(sin(t * 0.55 + ph) * 3.0 + 0.8, 0.0, 1.0)
+		var flap := sin(t * rate + ph) * 38.0 * burst + 8.0 * (1.0 - burst)
+		(b.get_node("Aile_1") as Node3D).rotation_degrees = Vector3(0, 0, flap)
+		(b.get_node("Aile_-1") as Node3D).rotation_degrees = Vector3(0, 0, -flap)
+		b.position.y += sin(t * rate + ph) * 0.05 * burst
 
 # ---------------------------------------------------------------------------
 # Ambiance

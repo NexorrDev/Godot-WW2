@@ -11,7 +11,9 @@ class_name Prop3D
 ## Texte optionnel posé à plat sur le modèle (ex. plaque nominative du bureau), lisible depuis +Z du monde
 @export var label_text: String = ""
 @export var label_pos: Vector3 = Vector3.ZERO
-@export var label_pixel_size: float = 0.00032
+@export var label_pixel_size: float = 0.00042
+## Inclinaison du texte (degrés) : la plaque nominative est un chevalet incliné
+@export var label_tilt_deg: float = 27.0
 
 func _ready() -> void:
 	if model_path == "" or get_child_count() > 0:
@@ -32,10 +34,12 @@ func _ready() -> void:
 		l.outline_size = 0
 		l.shaded = false
 		l.double_sided = false
-		l.position = label_pos
-		# à plat : droite du texte = +Z local, haut du texte = +X local, normale = +Y
-		l.basis = Basis(Vector3(0, 0, 1), Vector3(1, 0, 0), Vector3(0, 1, 0))
+		l.top_level = true  # ignore l'échelle du bureau : le texte reste net
 		inst.add_child(l)
+		l.global_position = to_global(label_pos)
+		var tilt := deg_to_rad(label_tilt_deg)
+		# texte lisible depuis le sud (+Z monde), incliné comme la face du chevalet
+		l.global_basis = Basis(Vector3(1, 0, 0), Vector3(0, sin(tilt), -cos(tilt)), Vector3(0, cos(tilt), sin(tilt)))
 	if not collide:
 		return
 	var box := AABB()

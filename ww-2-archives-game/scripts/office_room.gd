@@ -33,19 +33,19 @@ const TEX_DIR: String = "res://assets/textures/room/"
 const PRESETS: Dictionary = {
 	1: { # NUIT FROIDE : lune bleue par la fenêtre, lampe de bureau chaude, crépuscule dehors
 		"light_color": Color(0.42, 0.56, 1.0), "light_energy": 0.95, "light_dir": Vector3(-0.78, -0.50, 0.30),
-		"ambient_color": Color(0.30, 0.33, 0.44), "ambient_energy": 1.0, "ceiling": 1.1,
+		"ambient_color": Color(0.13, 0.15, 0.24), "ambient_energy": 0.85, "ceiling": 0.10, "corner": 0.03,
 		"lamp": 1.7, "fill_color": Color(0.45, 0.56, 0.85), "fill": 0.40,
 		"bg": Color(0.02, 0.02, 0.04), "sky": "dusk",
 	},
 	2: { # AUBE : lumière orangée rasante
 		"light_color": Color(1.0, 0.70, 0.46), "light_energy": 1.25, "light_dir": Vector3(-0.92, -0.26, 0.22),
-		"ambient_color": Color(0.42, 0.38, 0.44), "ambient_energy": 0.95, "ceiling": 0.9,
+		"ambient_color": Color(0.30, 0.26, 0.32), "ambient_energy": 0.75, "ceiling": 0.22, "corner": 0.07,
 		"lamp": 1.7, "fill_color": Color(1.0, 0.65, 0.40), "fill": 0.7,
 		"bg": Color(0.05, 0.04, 0.06), "sky": "dawn",
 	},
 	3: { # PLEIN JOUR : soleil franc, lampe presque inutile
 		"light_color": Color(1.0, 0.95, 0.82), "light_energy": 1.7, "light_dir": Vector3(-0.72, -0.66, 0.18),
-		"ambient_color": Color(0.55, 0.57, 0.62), "ambient_energy": 1.0, "ceiling": 0.5,
+		"ambient_color": Color(0.52, 0.54, 0.58), "ambient_energy": 1.0, "ceiling": 0.25, "corner": 0.12,
 		"lamp": 0.5, "fill_color": Color(1.0, 0.97, 0.9), "fill": 0.5,
 		"bg": Color(0.20, 0.22, 0.25), "sky": "day",
 	},
@@ -56,6 +56,7 @@ var sun: DirectionalLight3D
 var lamp: OmniLight3D
 var fill: OmniLight3D
 var ceil_light: OmniLight3D
+var corner_lights: Array[OmniLight3D] = []
 var env: Environment
 var window_view: WindowView
 var current_period: int = 1
@@ -109,6 +110,8 @@ func _mix(a: Dictionary, b: Dictionary, t: float) -> void:
 
 	lamp.light_energy = lerpf(a["lamp"], b["lamp"], t)
 	ceil_light.light_energy = lerpf(a.get("ceiling", 1.0), b.get("ceiling", 1.0), t)
+	for c in corner_lights:
+		c.light_energy = lerpf(a.get("corner", 0.1), b.get("corner", 0.1), t)
 	var fa: Color = a["fill_color"]
 	fill.light_color = fa.lerp(b["fill_color"], t)
 	fill.light_energy = lerpf(a["fill"], b["fill"], t)
@@ -363,7 +366,7 @@ func _build_lights() -> void:
 	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	env.fog_enabled = true
 	env.fog_light_color = Color(0.06, 0.07, 0.11)
-	env.fog_density = 0.004
+	env.fog_density = 0.008
 	we.environment = env
 	add_child(we)
 
@@ -404,6 +407,7 @@ func _build_lights() -> void:
 		c.light_energy = 0.35
 		c.omni_range = 6.0
 		add_child(c)
+		corner_lights.append(c)
 
 	# Appoint près de la fenêtre : donne la lueur de la lumière extérieure sur le mur et les meubles
 	fill = OmniLight3D.new()

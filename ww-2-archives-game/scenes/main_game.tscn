@@ -104,7 +104,7 @@ script = ExtResource("90_prop")
 model_path = "res://assets/models/louka/bureau.glb"
 collision_height = 0.76
 label_text = "ARCHIVISTE"
-label_pos = Vector3(0.23, 0.824, -0.435)
+label_pos = Vector3(0.18, 0.797, -0.435)
 
 [node name="Chaise" type="StaticBody3D" parent="."]
 transform = Transform3D(-0.94, 0, 0.34, 0, 1, 0, -0.34, 0, -0.94, 0.95, 0, 1.55)
