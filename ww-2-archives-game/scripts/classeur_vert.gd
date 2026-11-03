@@ -60,9 +60,9 @@ func _ready() -> void:
 	drawer.add_child(inst)
 	var cs := CollisionShape3D.new()
 	var bs := BoxShape3D.new()
-	bs.size = Vector3(0.48, 0.48, 0.52)
+	bs.size = Vector3(0.48, 0.48, 0.36)
 	cs.shape = bs
-	cs.position = Vector3(0, 0.77, 0.153)
+	cs.position = Vector3(0, 0.77, 0.274)
 	drawer.add_child(cs)
 	drawer_closed_pos = Vector3(0, 0, -SLIDE)
 	drawer.position = drawer_closed_pos

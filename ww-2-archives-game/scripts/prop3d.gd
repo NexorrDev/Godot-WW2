@@ -6,6 +6,12 @@ class_name Prop3D
 @export_file("*.glb") var model_path: String = ""
 @export var collide: bool = true
 @export var collision_shrink: float = 0.0
+## Si > 0 : hauteur max de la collision (le bureau ne doit pas englober les objets posés dessus)
+@export var collision_height: float = 0.0
+## Texte optionnel posé à plat sur le modèle (ex. plaque nominative du bureau), lisible depuis +Z du monde
+@export var label_text: String = ""
+@export var label_pos: Vector3 = Vector3.ZERO
+@export var label_pixel_size: float = 0.00032
 
 func _ready() -> void:
 	if model_path == "" or get_child_count() > 0:
@@ -16,6 +22,20 @@ func _ready() -> void:
 		return
 	var inst := scn.instantiate() as Node3D
 	add_child(inst)
+	if label_text != "":
+		var l := Label3D.new()
+		l.text = label_text
+		l.font = UIStyle.font_title()
+		l.font_size = 64
+		l.pixel_size = label_pixel_size
+		l.modulate = Color(0.12, 0.10, 0.08)
+		l.outline_size = 0
+		l.shaded = false
+		l.double_sided = false
+		l.position = label_pos
+		# à plat : droite du texte = +Z local, haut du texte = +X local, normale = +Y
+		l.basis = Basis(Vector3(0, 0, 1), Vector3(1, 0, 0), Vector3(0, 1, 0))
+		inst.add_child(l)
 	if not collide:
 		return
 	var box := AABB()
@@ -28,6 +48,8 @@ func _ready() -> void:
 		first = false
 	if first:
 		return
+	if collision_height > 0.0:
+		box.size.y = collision_height
 	var cs := CollisionShape3D.new()
 	var bs := BoxShape3D.new()
 	bs.size = box.size - Vector3.ONE * collision_shrink

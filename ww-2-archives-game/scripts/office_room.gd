@@ -19,8 +19,8 @@ const T: float = 0.25                # épaisseur des murs
 
 # Porte des archives (mur ouest, verrouillée jusqu'à la date 14)
 const ARCH_DOOR_Z: float = -1.1
-const ARCH_DOOR_W: float = 1.26
-const DOOR_H: float = 2.2
+const ARCH_DOOR_W: float = 1.0
+const DOOR_H: float = 2.1
 # Fenêtre (mur est)
 const WIN_Z: float = -2.3
 const WIN_W: float = 1.5
@@ -33,19 +33,19 @@ const TEX_DIR: String = "res://assets/textures/room/"
 const PRESETS: Dictionary = {
 	1: { # NUIT FROIDE : lune bleue par la fenêtre, lampe de bureau chaude, crépuscule dehors
 		"light_color": Color(0.42, 0.56, 1.0), "light_energy": 0.95, "light_dir": Vector3(-0.78, -0.50, 0.30),
-		"ambient_color": Color(0.12, 0.14, 0.22), "ambient_energy": 0.80,
+		"ambient_color": Color(0.30, 0.33, 0.44), "ambient_energy": 1.0, "ceiling": 1.1,
 		"lamp": 1.7, "fill_color": Color(0.45, 0.56, 0.85), "fill": 0.40,
 		"bg": Color(0.02, 0.02, 0.04), "sky": "dusk",
 	},
 	2: { # AUBE : lumière orangée rasante
 		"light_color": Color(1.0, 0.70, 0.46), "light_energy": 1.25, "light_dir": Vector3(-0.92, -0.26, 0.22),
-		"ambient_color": Color(0.30, 0.27, 0.34), "ambient_energy": 0.75,
+		"ambient_color": Color(0.42, 0.38, 0.44), "ambient_energy": 0.95, "ceiling": 0.9,
 		"lamp": 1.7, "fill_color": Color(1.0, 0.65, 0.40), "fill": 0.7,
 		"bg": Color(0.05, 0.04, 0.06), "sky": "dawn",
 	},
 	3: { # PLEIN JOUR : soleil franc, lampe presque inutile
 		"light_color": Color(1.0, 0.95, 0.82), "light_energy": 1.7, "light_dir": Vector3(-0.72, -0.66, 0.18),
-		"ambient_color": Color(0.46, 0.48, 0.52), "ambient_energy": 0.95,
+		"ambient_color": Color(0.55, 0.57, 0.62), "ambient_energy": 1.0, "ceiling": 0.5,
 		"lamp": 0.5, "fill_color": Color(1.0, 0.97, 0.9), "fill": 0.5,
 		"bg": Color(0.20, 0.22, 0.25), "sky": "day",
 	},
@@ -55,6 +55,7 @@ var mats: Dictionary = {}
 var sun: DirectionalLight3D
 var lamp: OmniLight3D
 var fill: OmniLight3D
+var ceil_light: OmniLight3D
 var env: Environment
 var window_view: WindowView
 var current_period: int = 1
@@ -107,6 +108,7 @@ func _mix(a: Dictionary, b: Dictionary, t: float) -> void:
 	env.background_color = bg.lerp(b["bg"], t)
 
 	lamp.light_energy = lerpf(a["lamp"], b["lamp"], t)
+	ceil_light.light_energy = lerpf(a.get("ceiling", 1.0), b.get("ceiling", 1.0), t)
 	var fa: Color = a["fill_color"]
 	fill.light_color = fa.lerp(b["fill_color"], t)
 	fill.light_energy = lerpf(a["fill"], b["fill"], t)
@@ -272,12 +274,14 @@ func _build_archives_door() -> void:
 	var x_in := -HALF_W
 	var z0 := ARCH_DOOR_Z - ARCH_DOOR_W / 2.0
 	var z1 := ARCH_DOOR_Z + ARCH_DOOR_W / 2.0
-	# Porte + encadrement : modèle de Louka, logé dans l'ouverture du mur
-	var door := (load("res://assets/models/louka/porte_archives.glb") as PackedScene).instantiate() as Node3D
-	door.name = "Porte_Archives"
-	door.position = Vector3(x_in, 0.0, ARCH_DOOR_Z)
-	add_child(door)
+	# Encadrement en saillie sur la pièce
+	_box("Chambranle_A", Vector3(x_in + 0.03, DOOR_H / 2.0, z0 - 0.03), Vector3(0.07, DOOR_H, 0.07), mats["wood"])
+	_box("Chambranle_B", Vector3(x_in + 0.03, DOOR_H / 2.0, z1 + 0.03), Vector3(0.07, DOOR_H, 0.07), mats["wood"])
+	_box("Chambranle_Haut", Vector3(x_in + 0.03, DOOR_H + 0.03, ARCH_DOOR_Z), Vector3(0.07, 0.07, ARCH_DOOR_W + 0.14), mats["wood"])
+	# Vantail en bois + vitre dépolie
 	var px := x_in - 0.06
+	_box("Porte_Archives", Vector3(px, DOOR_H / 2.0, ARCH_DOOR_Z), Vector3(0.05, DOOR_H - 0.01, ARCH_DOOR_W - 0.01), mats["wood"])
+	_box("Vitre_Archives", Vector3(px + 0.01, 1.42, ARCH_DOOR_Z), Vector3(0.06, 1.0, 0.72), mats["frosted"], false)
 
 	var label := Label3D.new()
 	label.name = "Label_Archives"
@@ -289,10 +293,11 @@ func _build_archives_door() -> void:
 	label.outline_size = 0
 	label.shaded = false
 	label.double_sided = false
-	label.position = Vector3(x_in + 0.105, 1.7, ARCH_DOOR_Z)
+	label.position = Vector3(px + 0.045, 1.45, ARCH_DOOR_Z)
 	label.rotation_degrees = Vector3(0, 90, 0)
 	add_child(label)
 
+	_box("Poignee_Archives", Vector3(x_in + 0.05, 1.0, z1 - 0.12), Vector3(0.05, 0.04, 0.14), mats["metal"], false)
 
 func _build_window() -> void:
 	var x_in := HALF_W
@@ -358,7 +363,7 @@ func _build_lights() -> void:
 	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	env.fog_enabled = true
 	env.fog_light_color = Color(0.06, 0.07, 0.11)
-	env.fog_density = 0.012
+	env.fog_density = 0.004
 	we.environment = env
 	add_child(we)
 
@@ -381,6 +386,24 @@ func _build_lights() -> void:
 	lamp.omni_attenuation = 1.6
 	lamp.shadow_enabled = true
 	add_child(lamp)
+
+	# Plafonnier (néon) : éclaire toute la pièce, sans ombres
+	ceil_light = OmniLight3D.new()
+	ceil_light.name = "Lumiere_Plafonnier"
+	ceil_light.position = Vector3(0, H - 0.35, -0.3)
+	ceil_light.light_color = Color(1.0, 0.93, 0.80)
+	ceil_light.omni_range = 11.0
+	ceil_light.omni_attenuation = 0.8
+	add_child(ceil_light)
+	# Appoints de coin pour que le fond de la pièce reste lisible
+	for p in [Vector3(-2.6, 2.2, -2.3), Vector3(2.6, 2.2, 2.3), Vector3(-2.6, 2.2, 2.3)]:
+		var c := OmniLight3D.new()
+		c.name = "Lumiere_Coin"
+		c.position = p
+		c.light_color = Color(1.0, 0.92, 0.8)
+		c.light_energy = 0.35
+		c.omni_range = 6.0
+		add_child(c)
 
 	# Appoint près de la fenêtre : donne la lueur de la lumière extérieure sur le mur et les meubles
 	fill = OmniLight3D.new()
