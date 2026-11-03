@@ -1,0 +1,45 @@
+name: Build web (test sur téléphone)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    env:
+      GODOT_VERSION: "4.7-stable"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Installer Godot et les templates d'export
+        run: |
+          base=https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}
+          wget -q $base/Godot_v${GODOT_VERSION}_linux.x86_64.zip -O godot.zip
+          wget -q $base/Godot_v${GODOT_VERSION}_export_templates.tpz -O templates.tpz
+          unzip -q godot.zip && sudo mv Godot_v${GODOT_VERSION}_linux.x86_64 /usr/local/bin/godot
+          mkdir -p ~/.local/share/godot/export_templates/4.7.stable
+          unzip -q templates.tpz -d tpl && mv tpl/templates/* ~/.local/share/godot/export_templates/4.7.stable/
+      - name: Export Web
+        working-directory: ww-2-archives-game
+        run: |
+          mkdir -p ../build/web
+          godot --headless --import || true
+          godot --headless --export-release "Web" ../build/web/index.html
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+  deploy:
+    needs: export
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

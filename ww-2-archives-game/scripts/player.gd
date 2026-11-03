@@ -25,9 +25,14 @@ var default_cam_pos: Vector3
 var bob_timer: float = 0.0
 var step_distance: float = 1.0 # Distance parcourue depuis le dernier bruit de pas
 var current_interactable: Interactable = null
+var touch: TouchControls = null
 
 func _ready() -> void:
 	add_to_group("player")
+	if Platform.is_mobile():
+		touch = TouchControls.new()
+		touch.name = "TouchControls"
+		add_child(touch)
 	default_cam_pos = camera.transform.origin
 	if prompt_label:
 		prompt_label.visible = false
@@ -55,8 +60,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not can_control:
 		return
 		
-	# Clic pour capturer la souris
-	if event is InputEventMouseButton and event.pressed:
+	# Clic pour capturer la souris (PC uniquement)
+	if event is InputEventMouseButton and event.pressed and touch == null:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 		
 	# Échap pour libérer la souris
@@ -69,7 +74,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			current_interactable.interact()
 
 	# Rotation de la vue avec la souris
-	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+	if touch == null and event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		rotate_y(-event.relative.x * mouse_sensitivity)
 		camera.rotate_x(-event.relative.y * mouse_sensitivity)
 		camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(-80.0), deg_to_rad(80.0))
@@ -93,7 +98,14 @@ func _physics_process(delta: float) -> void:
 	if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT):
 		input_dir.x += 1.0
 
-	input_dir = input_dir.normalized()
+	if touch != null:
+		input_dir = touch.move_vector
+		var lk := touch.consume_look() * (mouse_sensitivity / base_mouse_sensitivity)
+		rotate_y(-lk.x)
+		camera.rotate_x(-lk.y)
+		camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(-80.0), deg_to_rad(80.0))
+	else:
+		input_dir = input_dir.normalized()
 	var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	
 	if direction != Vector3.ZERO:
@@ -167,7 +179,7 @@ func _handle_interaction() -> void:
 		if collider is Interactable:
 			current_interactable = collider
 			if prompt_label:
-				prompt_label.text = "[E] " + current_interactable.prompt_message
+				prompt_label.text = ("" if touch != null else "[E] ") + current_interactable.prompt_message
 				prompt_label.visible = true
 			if crosshair:
 				crosshair.color = Color(1.0, 0.9, 0.3, 0.9)
