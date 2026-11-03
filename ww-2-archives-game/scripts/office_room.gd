@@ -19,8 +19,8 @@ const T: float = 0.25                # épaisseur des murs
 
 # Porte des archives (mur ouest, verrouillée jusqu'à la date 14)
 const ARCH_DOOR_Z: float = -1.1
-const ARCH_DOOR_W: float = 1.0
-const DOOR_H: float = 2.1
+const ARCH_DOOR_W: float = 1.26
+const DOOR_H: float = 2.2
 # Fenêtre (mur est)
 const WIN_Z: float = -2.3
 const WIN_W: float = 1.5
@@ -272,14 +272,12 @@ func _build_archives_door() -> void:
 	var x_in := -HALF_W
 	var z0 := ARCH_DOOR_Z - ARCH_DOOR_W / 2.0
 	var z1 := ARCH_DOOR_Z + ARCH_DOOR_W / 2.0
-	# Encadrement en saillie sur la pièce
-	_box("Chambranle_A", Vector3(x_in + 0.03, DOOR_H / 2.0, z0 - 0.03), Vector3(0.07, DOOR_H, 0.07), mats["wood"])
-	_box("Chambranle_B", Vector3(x_in + 0.03, DOOR_H / 2.0, z1 + 0.03), Vector3(0.07, DOOR_H, 0.07), mats["wood"])
-	_box("Chambranle_Haut", Vector3(x_in + 0.03, DOOR_H + 0.03, ARCH_DOOR_Z), Vector3(0.07, 0.07, ARCH_DOOR_W + 0.14), mats["wood"])
-	# Vantail en bois + vitre dépolie
+	# Porte + encadrement : modèle de Louka, logé dans l'ouverture du mur
+	var door := (load("res://assets/models/louka/porte_archives.glb") as PackedScene).instantiate() as Node3D
+	door.name = "Porte_Archives"
+	door.position = Vector3(x_in, 0.0, ARCH_DOOR_Z)
+	add_child(door)
 	var px := x_in - 0.06
-	_box("Porte_Archives", Vector3(px, DOOR_H / 2.0, ARCH_DOOR_Z), Vector3(0.05, DOOR_H - 0.01, ARCH_DOOR_W - 0.01), mats["wood"])
-	_box("Vitre_Archives", Vector3(px + 0.01, 1.42, ARCH_DOOR_Z), Vector3(0.06, 1.0, 0.72), mats["frosted"], false)
 
 	var label := Label3D.new()
 	label.name = "Label_Archives"
@@ -291,11 +289,10 @@ func _build_archives_door() -> void:
 	label.outline_size = 0
 	label.shaded = false
 	label.double_sided = false
-	label.position = Vector3(px + 0.045, 1.45, ARCH_DOOR_Z)
+	label.position = Vector3(x_in + 0.105, 1.7, ARCH_DOOR_Z)
 	label.rotation_degrees = Vector3(0, 90, 0)
 	add_child(label)
 
-	_box("Poignee_Archives", Vector3(x_in + 0.05, 1.0, z1 - 0.12), Vector3(0.05, 0.04, 0.14), mats["metal"], false)
 
 func _build_window() -> void:
 	var x_in := HALF_W
