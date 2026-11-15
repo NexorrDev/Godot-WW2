@@ -1,4 +1,4 @@
-[gd_scene load_steps=41 format=3 uid="uid://diu7ms6dkb6uw"]
+[gd_scene load_steps=50 format=3 uid="uid://diu7ms6dkb6uw"]
 
 [ext_resource type="Script" path="res://scripts/main_game.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/office_room.gd" id="14_room"]
@@ -20,6 +20,15 @@
 [ext_resource type="Script" path="res://scripts/enigmas/enigma_midway.gd" id="25_enigma_midway"]
 [ext_resource type="Script" path="res://scripts/coin_machine.gd" id="26_coin_machine"]
 [ext_resource type="Script" path="res://scripts/coin_midway.gd" id="27_coin_midway"]
+[ext_resource type="Script" path="res://scripts/enigmas/enigma_boussole.gd" id="30_enigma_boussole"]
+[ext_resource type="Script" path="res://scripts/enigmas/enigma_veste.gd" id="31_enigma_veste"]
+[ext_resource type="Script" path="res://scripts/enigmas/enigma_normandie.gd" id="32_enigma_normandie"]
+[ext_resource type="Script" path="res://scripts/enigmas/enigma_tampon.gd" id="33_enigma_tampon"]
+[ext_resource type="Script" path="res://scripts/enigmas/enigma_elbe.gd" id="34_enigma_elbe"]
+[ext_resource type="Script" path="res://scripts/enigmas/enigma_digicode.gd" id="35_enigma_digicode"]
+[ext_resource type="Script" path="res://scripts/ending_screen.gd" id="36_ending"]
+[ext_resource type="Script" path="res://scripts/coin_periode2.gd" id="37_coin2"]
+[ext_resource type="Script" path="res://scripts/coin_periode3.gd" id="38_coin3"]
 [ext_resource type="PackedScene" path="res://scenes/carnet_archives.tscn" id="8_carnet"]
 [ext_resource type="Script" path="res://scripts/radio_item.gd" id="9_radio_item"]
 [ext_resource type="PackedScene" path="res://scenes/enigmas/enigma_radio.tscn" id="10_enigma_radio"]
@@ -186,6 +195,12 @@ script = ExtResource("26_coin_machine")
 [node name="Coin_Midway" type="Node3D" parent="."]
 script = ExtResource("27_coin_midway")
 
+[node name="Coin_Periode2" type="Node3D" parent="."]
+script = ExtResource("37_coin2")
+
+[node name="Coin_Periode3" type="Node3D" parent="."]
+script = ExtResource("38_coin3")
+
 [node name="Joueur" type="CharacterBody3D" parent="."]
 transform = Transform3D(0.951056, 0, -0.309017, 0, 1, 0, 0.309017, 0, 0.951056, -0.5, 0, 2.4)
 script = ExtResource("2_player")
@@ -255,6 +270,27 @@ script = ExtResource("24_enigma_machine")
 
 [node name="EnigmaMidway" type="CanvasLayer" parent="."]
 script = ExtResource("25_enigma_midway")
+
+[node name="EnigmaBoussole" type="CanvasLayer" parent="."]
+script = ExtResource("30_enigma_boussole")
+
+[node name="EnigmaVeste" type="CanvasLayer" parent="."]
+script = ExtResource("31_enigma_veste")
+
+[node name="EnigmaNormandie" type="CanvasLayer" parent="."]
+script = ExtResource("32_enigma_normandie")
+
+[node name="EnigmaTampon" type="CanvasLayer" parent="."]
+script = ExtResource("33_enigma_tampon")
+
+[node name="EnigmaElbe" type="CanvasLayer" parent="."]
+script = ExtResource("34_enigma_elbe")
+
+[node name="EnigmaDigicode" type="CanvasLayer" parent="."]
+script = ExtResource("35_enigma_digicode")
+
+[node name="EndingScreen" type="CanvasLayer" parent="."]
+script = ExtResource("36_ending")
 
 [node name="EnigmaCarte" type="CanvasLayer" parent="."]
 script = ExtResource("17_enigma_carte")
