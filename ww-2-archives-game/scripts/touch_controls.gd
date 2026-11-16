@@ -100,6 +100,9 @@ func _over_button(pos: Vector2) -> bool:
 	for b in [_btn_act, _btn_menu, _btn_back]:
 		if b.visible and b.get_global_rect().has_point(pos):
 			return true
+	for n in get_tree().get_nodes_in_group("touch_block"):
+		if n is Control and n.is_visible_in_tree() and n.get_global_rect().has_point(pos):
+			return true
 	return false
 
 func _input(event: InputEvent) -> void:

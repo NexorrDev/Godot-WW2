@@ -6,7 +6,7 @@ class_name OfficeRoom
 ##
 ## Contenu : sol carrelé, murs en plâtre, plafond à dalles, porte des archives (mur ouest),
 ## fenêtre à store (mur est) avec vue sur la ville, plinthes,
-## éclairage et ambiance qui changent avec la période (nuit / aube / jour).
+## éclairage et ambiance qui changent avec la période (matin / midi-après-midi / soir).
 ##
 ## Repère : x vers l'est, z vers le sud. La pièce fait 7,2 m (x) sur 6,6 m (z), 3 m sous plafond.
 ## Le fond de la pièce (étagères, classeurs verts, tableau en liège) est le mur nord (z = -3,3).
@@ -31,23 +31,23 @@ const TEX_DIR: String = "res://assets/textures/room/"
 
 ## Une entrée par période. Les valeurs sont mélangées en fondu quand la période change.
 const PRESETS: Dictionary = {
-	1: { # NUIT FROIDE : lune bleue par la fenêtre, lampe de bureau chaude, crépuscule dehors
-		"light_color": Color(0.42, 0.56, 1.0), "light_energy": 0.95, "light_dir": Vector3(-0.78, -0.50, 0.30),
-		"ambient_color": Color(0.13, 0.15, 0.24), "ambient_energy": 0.85, "ceiling": 0.10, "corner": 0.03,
-		"lamp": 1.7, "fill_color": Color(0.45, 0.56, 0.85), "fill": 0.40,
-		"bg": Color(0.02, 0.02, 0.04), "sky": "dusk",
+	1: { # MATIN : lumière claire et fraîche qui entre par la fenêtre est, soleil encore bas
+		"light_color": Color(1.0, 0.91, 0.76), "light_energy": 1.35, "light_dir": Vector3(-0.82, -0.40, 0.25),
+		"ambient_color": Color(0.30, 0.34, 0.44), "ambient_energy": 0.9, "ceiling": 0.30, "corner": 0.08,
+		"lamp": 1.2, "fill_color": Color(0.80, 0.88, 1.0), "fill": 0.45,
+		"bg": Color(0.10, 0.12, 0.16), "sky": "morning",
 	},
-	2: { # AUBE : lumière orangée rasante
-		"light_color": Color(1.0, 0.70, 0.46), "light_energy": 1.25, "light_dir": Vector3(-0.92, -0.26, 0.22),
-		"ambient_color": Color(0.30, 0.26, 0.32), "ambient_energy": 0.75, "ceiling": 0.22, "corner": 0.07,
-		"lamp": 1.7, "fill_color": Color(1.0, 0.65, 0.40), "fill": 0.7,
-		"bg": Color(0.05, 0.04, 0.06), "sky": "dawn",
-	},
-	3: { # PLEIN JOUR : soleil franc, lampe presque inutile
-		"light_color": Color(1.0, 0.95, 0.82), "light_energy": 1.7, "light_dir": Vector3(-0.72, -0.66, 0.18),
-		"ambient_color": Color(0.52, 0.54, 0.58), "ambient_energy": 1.0, "ceiling": 0.25, "corner": 0.12,
-		"lamp": 0.5, "fill_color": Color(1.0, 0.97, 0.9), "fill": 0.5,
+	2: { # MIDI / APRÈS-MIDI : soleil haut, lumière blanche et franche
+		"light_color": Color(1.0, 0.97, 0.88), "light_energy": 1.9, "light_dir": Vector3(-0.58, -0.78, 0.15),
+		"ambient_color": Color(0.52, 0.54, 0.58), "ambient_energy": 1.0, "ceiling": 0.22, "corner": 0.12,
+		"lamp": 0.4, "fill_color": Color(1.0, 0.98, 0.92), "fill": 0.5,
 		"bg": Color(0.20, 0.22, 0.25), "sky": "day",
+	},
+	3: { # SOIR : soleil couchant orange-rouge, ombres longues, lampe de bureau allumée
+		"light_color": Color(1.0, 0.52, 0.24), "light_energy": 1.35, "light_dir": Vector3(-0.94, -0.17, 0.2),
+		"ambient_color": Color(0.30, 0.22, 0.28), "ambient_energy": 0.8, "ceiling": 0.28, "corner": 0.08,
+		"lamp": 1.7, "fill_color": Color(1.0, 0.50, 0.28), "fill": 0.6,
+		"bg": Color(0.07, 0.05, 0.07), "sky": "evening",
 	},
 }
 

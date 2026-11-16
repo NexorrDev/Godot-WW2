@@ -13,6 +13,24 @@ class_name WindowView
 const GROUND_Y := -12.0   # niveau de la rue par rapport au sol de la salle
 
 const PRESETS: Dictionary = {
+	"morning": { # MATIN CLAIR
+		"sky_top": Color(0.33, 0.54, 0.90), "sky_horizon": Color(0.96, 0.89, 0.78),
+		"disc_dir": Vector3(1.0, 0.22, -0.78), "disc_size": 0.045, "disc_col": Color(1.0, 0.95, 0.80),
+		"glow_col": Color(1.0, 0.85, 0.60), "glow_amt": 0.75,
+		"stars": 0.0, "cloud_col": Color(1.0, 0.96, 0.92), "cloud_cover": 0.35,
+		"tint": Color(0.62, 0.62, 0.62), "fog_density": 0.009,
+		"lit_col": Color(1.0, 0.85, 0.55), "lit_amount": 0.15, "lit_ratio": 0.03,
+		"lamp_amt": 0.3, "smoke_col": Color(0.9, 0.9, 0.92, 0.5), "birds": 1.0,
+	},
+	"evening": { # SOIR : COUCHER DE SOLEIL
+		"sky_top": Color(0.16, 0.15, 0.42), "sky_horizon": Color(1.0, 0.42, 0.20),
+		"disc_dir": Vector3(1.0, 0.05, -0.78), "disc_size": 0.07, "disc_col": Color(1.0, 0.60, 0.28),
+		"glow_col": Color(1.0, 0.38, 0.14), "glow_amt": 1.4,
+		"stars": 0.1, "cloud_col": Color(1.0, 0.45, 0.35), "cloud_cover": 0.5,
+		"tint": Color(0.42, 0.28, 0.30), "fog_density": 0.014,
+		"lit_col": Color(1.0, 0.72, 0.38), "lit_amount": 0.9, "lit_ratio": 0.2,
+		"lamp_amt": 0.8, "smoke_col": Color(0.70, 0.40, 0.35, 0.55), "birds": 1.0,
+	},
 	"dusk": { # NUIT FROIDE
 		"sky_top": Color(0.015, 0.025, 0.08), "sky_horizon": Color(0.17, 0.19, 0.36),
 		"disc_dir": Vector3(1.0, 0.24, -0.78), "disc_size": 0.020, "disc_col": Color(0.92, 0.95, 1.0),

@@ -5,6 +5,10 @@ class_name CoinPeriode2
 ## (Stalingrad), boîte « Méditerranée » en haut de l'étagère + chaise (Sicile). Placeholders pour Louka.
 
 func _ready() -> void:
+	_build()
+	PeriodGate.bind(self, 2)
+
+func _build() -> void:
 	if get_child_count() > 0:
 		return
 	_build_boussole()

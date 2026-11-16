@@ -10,6 +10,10 @@ var coffre_front: StaticBody3D
 var dossier_noir: StaticBody3D
 
 func _ready() -> void:
+	_build()
+	PeriodGate.bind(self, 3)
+
+func _build() -> void:
 	if get_child_count() > 0:
 		return
 	_build_tableau_normandie()

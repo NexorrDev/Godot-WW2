@@ -1,4 +1,4 @@
-[gd_scene load_steps=50 format=3 uid="uid://diu7ms6dkb6uw"]
+[gd_scene load_steps=52 format=3 uid="uid://diu7ms6dkb6uw"]
 
 [ext_resource type="Script" path="res://scripts/main_game.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/office_room.gd" id="14_room"]
@@ -29,6 +29,8 @@
 [ext_resource type="Script" path="res://scripts/ending_screen.gd" id="36_ending"]
 [ext_resource type="Script" path="res://scripts/coin_periode2.gd" id="37_coin2"]
 [ext_resource type="Script" path="res://scripts/coin_periode3.gd" id="38_coin3"]
+[ext_resource type="Script" path="res://scripts/enigmas/enigma_hint.gd" id="39_hint"]
+[ext_resource type="Script" path="res://scripts/hint_bulb.gd" id="40_bulb"]
 [ext_resource type="PackedScene" path="res://scenes/carnet_archives.tscn" id="8_carnet"]
 [ext_resource type="Script" path="res://scripts/radio_item.gd" id="9_radio_item"]
 [ext_resource type="PackedScene" path="res://scenes/enigmas/enigma_radio.tscn" id="10_enigma_radio"]
@@ -291,6 +293,12 @@ script = ExtResource("35_enigma_digicode")
 
 [node name="EndingScreen" type="CanvasLayer" parent="."]
 script = ExtResource("36_ending")
+
+[node name="EnigmaHint" type="CanvasLayer" parent="."]
+script = ExtResource("39_hint")
+
+[node name="HintBulb" type="CanvasLayer" parent="."]
+script = ExtResource("40_bulb")
 
 [node name="EnigmaCarte" type="CanvasLayer" parent="."]
 script = ExtResource("17_enigma_carte")

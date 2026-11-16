@@ -16,6 +16,10 @@ func _box(size: Vector3, color: Color, pos: Vector3 = Vector3.ZERO) -> MeshInsta
 	return m
 
 func _ready() -> void:
+	_build()
+	PeriodGate.bind(self, 2)
+
+func _build() -> void:
 	if get_child_count() > 0:
 		return
 	# --- Tableau en liège, mur nord (z = -3,3), face vers +z ---

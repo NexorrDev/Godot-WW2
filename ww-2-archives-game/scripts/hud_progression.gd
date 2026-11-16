@@ -11,9 +11,9 @@ const SEGMENT_EMPTY: Color = Color(0.28, 0.26, 0.23, 1.0)
 const TOAST_HOLD: float = 3.2
 
 const PERIOD_NAMES: Dictionary = {
-	1: "PÉRIODE 1 · LES VICTOIRES DE L'AXE (1939-1941)",
-	2: "PÉRIODE 2 · LE TOURNANT DE LA GUERRE (1942-1943)",
-	3: "PÉRIODE 3 · LA VICTOIRE DES ALLIÉS (1944-1945)",
+	1: "PÉRIODE 1 · LES VICTOIRES DE L'AXE (1939-1941) · MATIN",
+	2: "PÉRIODE 2 · LE TOURNANT DE LA GUERRE (1942-1943) · MIDI",
+	3: "PÉRIODE 3 · LA VICTOIRE DES ALLIÉS (1944-1945) · SOIR",
 }
 
 @onready var root_control: Control = $RootControl

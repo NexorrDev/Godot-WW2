@@ -31,6 +31,10 @@ func _label(text: String, size: int, px: float, color: Color, pos: Vector3, rot:
 	return l
 
 func _ready() -> void:
+	_build()
+	PeriodGate.bind(self, 2)
+
+func _build() -> void:
 	if get_child_count() > 0:
 		return
 	# Petite table (le mur est est à x = +3,6 : la pièce est à -x, donc l'avant regarde -x)
