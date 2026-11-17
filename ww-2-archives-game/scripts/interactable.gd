@@ -6,6 +6,9 @@ class_name Interactable
 
 @export var prompt_message: String = "Examiner"
 
+## Verrouillé par le fil narratif (PeriodGate) : l'objet reste visible mais on ne peut pas encore interagir avec.
+var locked := false
+
 signal interacted()
 
 func interact() -> void:

@@ -176,7 +176,7 @@ func _handle_interaction() -> void:
 		
 	if interaction_ray.is_colliding():
 		var collider = interaction_ray.get_collider()
-		if collider is Interactable:
+		if collider is Interactable and not collider.locked:
 			current_interactable = collider
 			if prompt_label:
 				prompt_label.text = ("" if touch != null else "[E] ") + current_interactable.prompt_message
