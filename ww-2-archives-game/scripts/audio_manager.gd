@@ -124,6 +124,7 @@ func _play(sound: String, volume_db: float, pitch_var: float) -> void:
 	player.play()
 
 func _duck(on: bool) -> void:
+	Music.duck(on)
 	if duck_tween and duck_tween.is_valid():
 		duck_tween.kill()
 	duck_tween = create_tween()

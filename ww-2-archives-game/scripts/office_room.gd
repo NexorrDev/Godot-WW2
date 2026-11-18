@@ -31,20 +31,20 @@ const TEX_DIR: String = "res://assets/textures/room/"
 
 ## Une entrée par période. Les valeurs sont mélangées en fondu quand la période change.
 const PRESETS: Dictionary = {
-	1: { # MATIN : lumière claire et fraîche qui entre par la fenêtre est, soleil encore bas
-		"light_color": Color(1.0, 0.91, 0.76), "light_energy": 1.35, "light_dir": Vector3(-0.82, -0.40, 0.25),
-		"ambient_color": Color(0.30, 0.34, 0.44), "ambient_energy": 0.9, "ceiling": 0.30, "corner": 0.08,
-		"lamp": 1.2, "fill_color": Color(0.80, 0.88, 1.0), "fill": 0.45,
-		"bg": Color(0.10, 0.12, 0.16), "sky": "morning",
+	1: { # MATIN (avant l'aube) : NUIT NOIRE. Lune froide par la fenêtre, lampe de bureau, néon presque éteint
+		"light_color": Color(0.55, 0.66, 1.0), "light_energy": 0.4, "light_dir": Vector3(-1.0, -0.34, 0.55),
+		"ambient_color": Color(0.05, 0.07, 0.14), "ambient_energy": 0.8, "ceiling": 0.10, "corner": 0.04,
+		"lamp": 2.1, "fill_color": Color(0.35, 0.48, 1.0), "fill": 0.18,
+		"bg": Color(0.005, 0.006, 0.012), "sky": "night",
 	},
 	2: { # MIDI / APRÈS-MIDI : soleil haut, lumière blanche et franche
-		"light_color": Color(1.0, 0.97, 0.88), "light_energy": 1.9, "light_dir": Vector3(-0.58, -0.78, 0.15),
+		"light_color": Color(1.0, 0.97, 0.88), "light_energy": 1.9, "light_dir": Vector3(-1.0, -1.1, 0.6),
 		"ambient_color": Color(0.52, 0.54, 0.58), "ambient_energy": 1.0, "ceiling": 0.22, "corner": 0.12,
 		"lamp": 0.4, "fill_color": Color(1.0, 0.98, 0.92), "fill": 0.5,
 		"bg": Color(0.20, 0.22, 0.25), "sky": "day",
 	},
-	3: { # SOIR : soleil couchant orange-rouge, ombres longues, lampe de bureau allumée
-		"light_color": Color(1.0, 0.52, 0.24), "light_energy": 1.35, "light_dir": Vector3(-0.94, -0.17, 0.2),
+	3: { # SOIR : COUCHER DE SOLEIL, soleil bas orange-rouge, ombres longues, lampe de bureau allumée
+		"light_color": Color(1.0, 0.50, 0.22), "light_energy": 1.5, "light_dir": Vector3(-1.0, -0.14, 0.5),
 		"ambient_color": Color(0.30, 0.22, 0.28), "ambient_energy": 0.8, "ceiling": 0.28, "corner": 0.08,
 		"lamp": 1.7, "fill_color": Color(1.0, 0.50, 0.28), "fill": 0.6,
 		"bg": Color(0.07, 0.05, 0.07), "sky": "evening",
@@ -61,6 +61,8 @@ var env: Environment
 var window_view: WindowView
 var current_period: int = 1
 var period_tween: Tween = null
+var shaft: MeshInstance3D
+var shaft_mat: ShaderMaterial
 
 func _ready() -> void:
 	add_to_group("office_room")
@@ -70,6 +72,7 @@ func _ready() -> void:
 	_build_collisions()
 	_build_lights()
 	_build_window_view()
+	_build_shaft()
 
 	current_period = clampi(GameManager.current_period, 1, 3)
 	_mix(PRESETS[current_period], PRESETS[current_period], 1.0)
@@ -88,11 +91,21 @@ func _on_period_changed(new_period: int) -> void:
 	current_period = new_period
 	if period_tween and period_tween.is_valid():
 		period_tween.kill()
-	if GameManager.is_loading:
-		_mix(to, to, 1.0)
+	if GameManager.is_loading or not get_tree().get_nodes_in_group("period_transition").is_empty():
+		# la transition (écran noir) appliquera elle-même la nouvelle ambiance via apply_period()
+		if GameManager.is_loading:
+			_mix(to, to, 1.0)
 		return
 	period_tween = create_tween()
 	period_tween.tween_method(func(t: float): _mix(from, to, t), 0.0, 1.0, 4.0).set_trans(Tween.TRANS_SINE)
+
+## Appelée par la transition de période, sous l'écran noir : ambiance changée d'un coup.
+func apply_period(p: int) -> void:
+	p = clampi(p, 1, 3)
+	current_period = p
+	if period_tween and period_tween.is_valid():
+		period_tween.kill()
+	_mix(PRESETS[p], PRESETS[p], 1.0)
 
 func _mix(a: Dictionary, b: Dictionary, t: float) -> void:
 	var ca: Color = a["light_color"]
@@ -115,6 +128,8 @@ func _mix(a: Dictionary, b: Dictionary, t: float) -> void:
 	var fa: Color = a["fill_color"]
 	fill.light_color = fa.lerp(b["fill_color"], t)
 	fill.light_energy = lerpf(a["fill"], b["fill"], t)
+
+	_update_shaft(sun.light_color, sun.light_energy, d)
 
 	# Vue extérieure (ciel, ville, lumières des immeubles) : mélange des deux ambiances
 	if window_view:
@@ -351,6 +366,85 @@ func _build_collisions() -> void:
 		cs.shape = bs
 		cs.position = s[0]
 		body.add_child(cs)
+
+
+# ---------------------------------------------------------------------------
+# Faisceau lumineux visible (poussière) : de la fenêtre jusqu'au sol / au mur d'en face
+# ---------------------------------------------------------------------------
+
+const SHAFT_SHADER := """
+shader_type spatial;
+render_mode unshaded, blend_add, cull_disabled, depth_draw_never;
+uniform vec3 col : source_color = vec3(1.0);
+uniform float strength = 0.1;
+varying float along;
+void vertex() { along = UV.x; }
+void fragment() {
+	float facing = 1.0 - abs(dot(normalize(NORMAL), normalize(VIEW)));
+	float fade = pow(1.0 - along, 1.6);
+	ALBEDO = col * strength * fade * (0.25 + facing * 1.3);
+}
+"""
+
+func _build_shaft() -> void:
+	shaft_mat = ShaderMaterial.new()
+	var sh := Shader.new(); sh.code = SHAFT_SHADER
+	shaft_mat.shader = sh
+	shaft = MeshInstance3D.new()
+	shaft.name = "Faisceau_Fenetre"
+	shaft.material_override = shaft_mat
+	shaft.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(shaft)
+
+func _update_shaft(color: Color, energy: float, dir: Vector3) -> void:
+	if shaft == null:
+		return
+	var d := dir.normalized()
+	var wz0 := WIN_Z - WIN_W / 2.0
+	var wz1 := WIN_Z + WIN_W / 2.0
+	var x := HALF_W
+	var corners := [Vector3(x, WIN_Y0, wz0), Vector3(x, WIN_Y0, wz1), Vector3(x, WIN_Y1, wz1), Vector3(x, WIN_Y1, wz0)]
+	var far: Array[Vector3] = []
+	var max_len := 0.0
+	for c in corners:
+		# longueur jusqu'au sol, au mur d'en face ou au mur du fond (le premier touché)
+		var l := 12.0
+		if d.y < -0.001:
+			l = minf(l, c.y / -d.y)
+		if d.x < -0.001:
+			l = minf(l, (c.x + HALF_W) / -d.x)
+		if d.z > 0.001:
+			l = minf(l, (HALF_D - c.z) / d.z)
+		elif d.z < -0.001:
+			l = minf(l, (-HALF_D - c.z) / d.z)
+		far.append(c + d * l)
+		max_len = maxf(max_len, l)
+	var verts := PackedVector3Array()
+	var norms := PackedVector3Array()
+	var uvs := PackedVector2Array()
+	for i in 4:
+		var j := (i + 1) % 4
+		var a: Vector3 = corners[i]
+		var b: Vector3 = corners[j]
+		var fa: Vector3 = far[i]
+		var fb: Vector3 = far[j]
+		var n := (b - a).cross(fa - a).normalized()
+		for tri in [[a, b, fa, 0.0, 0.0, 1.0], [b, fb, fa, 0.0, 1.0, 1.0]]:
+			for k in 3:
+				verts.append(tri[k])
+				norms.append(n)
+				uvs.append(Vector2(tri[3 + k], 0))
+	var arr := []
+	arr.resize(Mesh.ARRAY_MAX)
+	arr[Mesh.ARRAY_VERTEX] = verts
+	arr[Mesh.ARRAY_NORMAL] = norms
+	arr[Mesh.ARRAY_TEX_UV] = uvs
+	var m := ArrayMesh.new()
+	m.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr)
+	shaft.mesh = m
+	shaft_mat.set_shader_parameter("col", Vector3(color.r, color.g, color.b))
+	shaft_mat.set_shader_parameter("strength", clampf(energy * 0.055, 0.0, 0.16))
+
 
 # ---------------------------------------------------------------------------
 # Lumières et environnement

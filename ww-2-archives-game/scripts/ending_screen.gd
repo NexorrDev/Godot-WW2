@@ -55,6 +55,14 @@ func _on_doc_closed(_id: String) -> void:
 
 func show_ending() -> void:
 	shown = true
+	get_tree().call_group("player", "pause_control")
+	# cinématique Hiroshima, juste avant le générique
+	var cine := HiroshimaCinematic.new()
+	add_child(cine)
+	cine.play()
+	await cine.finished
+	cine.queue_free()
+	Music.set_level(-14.0, 3.0)
 	visible = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	get_tree().call_group("player", "pause_control")

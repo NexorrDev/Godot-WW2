@@ -22,9 +22,18 @@ const PRESETS: Dictionary = {
 		"lit_col": Color(1.0, 0.85, 0.55), "lit_amount": 0.15, "lit_ratio": 0.03,
 		"lamp_amt": 0.3, "smoke_col": Color(0.9, 0.9, 0.92, 0.5), "birds": 1.0,
 	},
+	"night": { # NUIT NOIRE (période 1) : lune, étoiles, réverbères, quelques fenêtres allumées
+		"sky_top": Color(0.002, 0.004, 0.018), "sky_horizon": Color(0.035, 0.045, 0.10),
+		"disc_dir": Vector3(1.0, 0.34, -0.55), "disc_size": 0.016, "disc_col": Color(0.82, 0.88, 1.0),
+		"glow_col": Color(0.20, 0.30, 0.62), "glow_amt": 0.35,
+		"stars": 1.0, "cloud_col": Color(0.05, 0.06, 0.12), "cloud_cover": 0.30,
+		"tint": Color(0.17, 0.20, 0.34), "fog_density": 0.010,
+		"lit_col": Color(1.0, 0.72, 0.34), "lit_amount": 1.0, "lit_ratio": 0.20,
+		"lamp_amt": 1.0, "smoke_col": Color(0.22, 0.25, 0.38, 0.45), "birds": 0.0,
+	},
 	"evening": { # SOIR : COUCHER DE SOLEIL
 		"sky_top": Color(0.16, 0.15, 0.42), "sky_horizon": Color(1.0, 0.42, 0.20),
-		"disc_dir": Vector3(1.0, 0.05, -0.78), "disc_size": 0.07, "disc_col": Color(1.0, 0.60, 0.28),
+		"disc_dir": Vector3(1.0, 0.14, -0.5), "disc_size": 0.07, "disc_col": Color(1.0, 0.60, 0.28),
 		"glow_col": Color(1.0, 0.38, 0.14), "glow_amt": 1.4,
 		"stars": 0.1, "cloud_col": Color(1.0, 0.45, 0.35), "cloud_cover": 0.5,
 		"tint": Color(0.42, 0.28, 0.30), "fog_density": 0.014,
@@ -51,7 +60,7 @@ const PRESETS: Dictionary = {
 	},
 	"day": { # PLEIN JOUR
 		"sky_top": Color(0.22, 0.46, 0.88), "sky_horizon": Color(0.76, 0.87, 0.97),
-		"disc_dir": Vector3(1.0, 1.1, -0.78), "disc_size": 0.05, "disc_col": Color(1.0, 0.98, 0.9),
+		"disc_dir": Vector3(1.0, 1.1, -0.6), "disc_size": 0.05, "disc_col": Color(1.0, 0.98, 0.9),
 		"glow_col": Color(1.0, 0.95, 0.8), "glow_amt": 0.4,
 		"stars": 0.0, "cloud_col": Color(1.0, 1.0, 1.0), "cloud_cover": 0.5,
 		"tint": Color(0.72, 0.70, 0.66), "fog_density": 0.0065,
@@ -204,6 +213,89 @@ void fragment() {
 }
 """
 
+const STREET_SHADER := """
+shader_type spatial;
+render_mode unshaded, cull_back;
+
+uniform vec3 tint : source_color = vec3(1.0);
+uniform vec3 fog_col : source_color = vec3(0.6);
+uniform float fog_density = 0.01;
+uniform float x0 = 3.6;
+uniform float gap_z0 = -22.5;
+uniform float gap_z1 = -14.0;
+uniform float lamp_amt = 0.0;
+
+varying vec3 wpos;
+void vertex() { wpos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz; }
+
+float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+
+// bande [a,b] le long d'un axe, avec bords nets
+float band(float v, float a, float b) { return step(a, v) * step(v, b); }
+
+void fragment() {
+	float rx = wpos.x - x0;      // distance au mur de la salle, vers l'extérieur
+	float z = wpos.z;
+	vec3 col = vec3(0.24, 0.23, 0.22);                     // cours, sol lointain
+	vec2 cell = floor(wpos.xz * 1.6);
+	col *= 0.85 + 0.3 * hash(cell);
+
+	// rue principale (le long de z) : x0+0 .. x0+11
+	float main_st = band(rx, 0.0, 11.0);
+	float main_side = main_st * (1.0 - band(rx, 1.7, 9.3));
+	float main_road = main_st * band(rx, 1.7, 9.3);
+	// rue transversale dans la trouée entre les immeubles
+	float cross_st = band(z, gap_z0, gap_z1) * step(11.0, rx) * step(rx, 80.0);
+	float cross_road = cross_st * band(z, gap_z0 + 1.6, gap_z1 - 1.6);
+	float cross_side = cross_st * (1.0 - band(z, gap_z0 + 1.6, gap_z1 - 1.6));
+
+	float road = clamp(main_road + cross_road, 0.0, 1.0);
+	float side = clamp(main_side + cross_side, 0.0, 1.0) * (1.0 - road);
+
+	// asphalte : grain + pavés usés
+	vec3 asphalt = vec3(0.20, 0.20, 0.215) * (0.8 + 0.4 * hash(floor(wpos.xz * 5.0)));
+	vec2 cob = fract(wpos.xz * 1.3);
+	asphalt *= 1.0 - 0.18 * (step(cob.x, 0.07) + step(cob.y, 0.07));
+	// trottoirs : dalles
+	vec3 pave = vec3(0.46, 0.44, 0.40) * (0.88 + 0.2 * hash(floor(wpos.xz * 0.9)));
+	vec2 sl = fract(wpos.xz * 0.85);
+	pave *= 1.0 - 0.22 * (step(sl.x, 0.05) + step(sl.y, 0.05));
+	// bordure
+	float curb = main_st * (band(rx, 1.55, 1.7) + band(rx, 9.3, 9.45)) + cross_st * (band(z, gap_z0 + 1.45, gap_z0 + 1.6) + band(z, gap_z1 - 1.6, gap_z1 - 1.45));
+
+	col = mix(col, pave, side);
+	col = mix(col, asphalt, road);
+	col = mix(col, vec3(0.62, 0.60, 0.55), clamp(curb, 0.0, 1.0) * 0.8);
+
+	// ligne centrale en pointillés
+	float dash_main = main_road * band(rx, 5.44, 5.56) * step(0.5, fract(z / 5.0));
+	float dash_cross = cross_road * band(z, (gap_z0 + gap_z1) * 0.5 - 0.06, (gap_z0 + gap_z1) * 0.5 + 0.06) * step(0.5, fract(wpos.x / 5.0));
+	col = mix(col, vec3(0.86, 0.82, 0.62), clamp(dash_main + dash_cross, 0.0, 1.0) * 0.85);
+	// passage piéton au carrefour
+	float zebra = main_road * band(z, gap_z0 - 3.2, gap_z0 - 1.9) * step(0.5, fract(rx * 1.4));
+	col = mix(col, vec3(0.78, 0.76, 0.70), zebra * 0.7);
+
+	col *= tint;
+	float d = length(wpos - CAMERA_POSITION_WORLD);
+	ALBEDO = mix(col, fog_col, clamp(1.0 - exp(-d * fog_density), 0.0, 1.0));
+}
+"""
+
+const POOL_SHADER := """
+shader_type spatial;
+render_mode unshaded, blend_add, cull_disabled, depth_draw_never;
+uniform float emit_amt = 0.0;
+void fragment() {
+	float d = length(UV - vec2(0.5)) * 2.0;
+	float a = pow(clamp(1.0 - d, 0.0, 1.0), 2.2);
+	ALBEDO = vec3(1.0, 0.72, 0.36) * a * 0.55 * emit_amt;
+}
+"""
+
+var pool_shader: Shader
+var street_shader: Shader
+var street_mat: ShaderMaterial
+var cars: Array[Node3D] = []
 var city_shader: Shader
 var flat_shader: Shader
 var sky_mat: ShaderMaterial
@@ -223,13 +315,15 @@ func setup(wall_x: float, window_z: float) -> void:
 	rng.seed = 1940
 	city_shader = Shader.new(); city_shader.code = CITY_SHADER
 	flat_shader = Shader.new(); flat_shader.code = FLAT_SHADER
+	street_shader = Shader.new(); street_shader.code = STREET_SHADER
+	pool_shader = Shader.new(); pool_shader.code = POOL_SHADER
 	_build_sky()
 	_build_ground()
 	_build_skyline()
 	_build_landmarks()
 	_build_street_lamps()
 	_build_birds()
-	apply_mix("dusk", "dusk", 1.0)
+	apply_mix("night", "night", 1.0)
 
 # ---------------------------------------------------------------------------
 # Construction
@@ -272,11 +366,82 @@ func _box(size: Vector3, mat: Material, pos: Vector3) -> MeshInstance3D:
 	return _mesh_node(b, mat, pos)
 
 func _build_ground() -> void:
-	# rue : asphalte + trottoirs, puis sol lointain (cour, toits bas) qui se fond dans la brume
-	_box(Vector3(11.0, 0.2, 300.0), _flat_mat(Color(0.12, 0.12, 0.13)), Vector3(x0 + 5.5, GROUND_Y, win_z - 40.0))
-	_box(Vector3(1.6, 0.35, 300.0), _flat_mat(Color(0.32, 0.31, 0.30)), Vector3(x0 + 0.8, GROUND_Y + 0.1, win_z - 40.0))
-	_box(Vector3(1.6, 0.35, 300.0), _flat_mat(Color(0.32, 0.31, 0.30)), Vector3(x0 + 10.2, GROUND_Y + 0.1, win_z - 40.0))
-	_box(Vector3(500.0, 0.2, 500.0), _flat_mat(Color(0.22, 0.22, 0.24)), Vector3(x0 + 270.0, GROUND_Y - 0.3, win_z - 40.0))
+	# sol : un grand plan avec rue principale, rue transversale, trottoirs, bordures, lignes et passage piéton
+	street_mat = ShaderMaterial.new()
+	street_mat.shader = street_shader
+	street_mat.set_shader_parameter("x0", x0)
+	street_mat.set_shader_parameter("gap_z0", win_z - 20.2)
+	street_mat.set_shader_parameter("gap_z1", win_z - 11.7)
+	var plane := BoxMesh.new()
+	plane.size = Vector3(500.0, 0.2, 500.0)
+	_mesh_node(plane, street_mat, Vector3(x0 + 250.0, GROUND_Y - 0.1, win_z - 40.0))
+	_build_cars()
+
+## Voitures de l'époque (boîtes arrondies à la main) : quelques-unes garées, deux qui roulent.
+func _car(pos: Vector3, color: Color, yaw: float, moving: bool) -> Node3D:
+	var car := Node3D.new()
+	car.position = pos
+	car.rotation_degrees.y = yaw
+	var body_mat := _flat_mat(color)
+	var glass := _flat_mat(Color(0.06, 0.07, 0.09))
+	var tyre := _flat_mat(Color(0.03, 0.03, 0.035))
+	var chrome := _flat_mat(Color(0.55, 0.55, 0.52))
+	var parts := [
+		[Vector3(1.75, 0.62, 4.3), Vector3(0, 0.62, 0), body_mat],        # caisse
+		[Vector3(1.62, 0.55, 2.05), Vector3(0, 1.17, 0.25), body_mat],    # habitacle
+		[Vector3(1.64, 0.40, 1.9), Vector3(0, 1.22, 0.25), glass],        # vitres
+		[Vector3(1.9, 0.12, 0.35), Vector3(0, 0.38, -2.1), chrome],       # pare-chocs
+		[Vector3(1.9, 0.12, 0.35), Vector3(0, 0.38, 2.1), chrome],
+	]
+	for p in parts:
+		var b := BoxMesh.new(); b.size = p[0]
+		var mi := MeshInstance3D.new(); mi.mesh = b; mi.material_override = p[2]; mi.position = p[1]
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		car.add_child(mi)
+	for wx in [-0.85, 0.85]:
+		for wz in [-1.4, 1.4]:
+			var c := CylinderMesh.new(); c.top_radius = 0.34; c.bottom_radius = 0.34; c.height = 0.22
+			var w := MeshInstance3D.new(); w.mesh = c; w.material_override = tyre
+			w.position = Vector3(wx, 0.34, wz); w.rotation_degrees = Vector3(0, 0, 90)
+			w.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			car.add_child(w)
+	# phares (avant = -Z du véhicule) et feux arrière : allumés la nuit seulement
+	for hx in [-0.6, 0.6]:
+		var hm := ShaderMaterial.new(); hm.shader = flat_shader
+		hm.set_shader_parameter("col", Color(0.7, 0.7, 0.6))
+		hm.set_shader_parameter("emit_col", Color(1.0, 0.92, 0.62))
+		lamp_mats.append(hm)
+		var hb := BoxMesh.new(); hb.size = Vector3(0.3, 0.2, 0.08)
+		var h := MeshInstance3D.new(); h.mesh = hb; h.material_override = hm; h.position = Vector3(hx, 0.7, -2.17)
+		h.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		car.add_child(h)
+		var tm := ShaderMaterial.new(); tm.shader = flat_shader
+		tm.set_shader_parameter("col", Color(0.5, 0.08, 0.06))
+		tm.set_shader_parameter("emit_col", Color(1.0, 0.12, 0.08))
+		lamp_mats.append(tm)
+		var tb := BoxMesh.new(); tb.size = Vector3(0.24, 0.14, 0.08)
+		var t := MeshInstance3D.new(); t.mesh = tb; t.material_override = tm; t.position = Vector3(hx, 0.72, 2.17)
+		t.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		car.add_child(t)
+	add_child(car)
+	if moving:
+		cars.append(car)
+	return car
+
+func _build_cars() -> void:
+	var colors := [Color(0.10, 0.12, 0.10), Color(0.28, 0.08, 0.07), Color(0.12, 0.13, 0.20), Color(0.30, 0.28, 0.22), Color(0.05, 0.05, 0.06), Color(0.22, 0.24, 0.26)]
+	var gy := GROUND_Y + 0.1
+	# garées le long du trottoir d'en face et de celui de la salle (tête-bêche)
+	var zs := [win_z + 14.0, win_z + 3.0, win_z - 7.5, win_z - 27.0, win_z - 36.0, win_z - 48.0]
+	for i in zs.size():
+		_car(Vector3(x0 + 2.55, gy, zs[i]), colors[i % colors.size()], 0.0 if i % 2 == 0 else 180.0, false)
+	for i in 3:
+		_car(Vector3(x0 + 8.45, gy, win_z + 8.0 - i * 15.0 - 20.0), colors[(i + 2) % colors.size()], 180.0, false)
+	# deux voitures qui roulent (sens opposés)
+	var a := _car(Vector3(x0 + 4.3, gy, win_z + 30.0), Color(0.07, 0.08, 0.09), 0.0, true)
+	a.set_meta("speed", 5.5)
+	var b := _car(Vector3(x0 + 6.8, gy, win_z - 80.0), Color(0.30, 0.06, 0.05), 180.0, true)
+	b.set_meta("speed", -4.5)
 
 func _city_mat(base: Color, roof: Color) -> ShaderMaterial:
 	var mat := ShaderMaterial.new()
@@ -392,17 +557,14 @@ func _build_street_lamps() -> void:
 		s.radius = 0.28
 		s.height = 0.56
 		_mesh_node(s, lamp, Vector3(px, GROUND_Y + 4.7, z))
-		# halo de lumière au sol (disque lumineux, visible la nuit)
-		var pool := CylinderMesh.new()
-		pool.top_radius = 3.2
-		pool.bottom_radius = 3.2
-		pool.height = 0.02
+		# halo de lumière au sol : disque doux additif, visible seulement la nuit
+		var pool := QuadMesh.new()
+		pool.size = Vector2(9.0, 9.0)
 		var pm := ShaderMaterial.new()
-		pm.shader = flat_shader
-		pm.set_shader_parameter("col", Color(0.12, 0.12, 0.13))
-		pm.set_shader_parameter("emit_col", Color(0.55, 0.42, 0.22))
+		pm.shader = pool_shader
 		lamp_mats.append(pm)
-		_mesh_node(pool, pm, Vector3(px, GROUND_Y + 0.22, z))
+		var mi := _mesh_node(pool, pm, Vector3(px, GROUND_Y + 0.14, z), Vector3(-90, 0, 0))
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		z -= 14.0
 
 func _add_smoke(pos: Vector3, scale: float) -> void:
@@ -523,7 +685,15 @@ func _build_birds() -> void:
 		add_child(bird)
 		birds.append(bird)
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	for c in cars:
+		var sp := float(c.get_meta("speed"))
+		# yaw 0 : l'avant (-Z) va vers -Z ; yaw 180 : vers +Z. speed > 0 => vers -Z
+		c.position.z -= sp * delta
+		if c.position.z < win_z - 110.0:
+			c.position.z = win_z + 40.0
+		elif c.position.z > win_z + 45.0:
+			c.position.z = win_z - 105.0
 	if bird_amount <= 0.01:
 		for b in birds:
 			b.visible = false
@@ -586,6 +756,10 @@ func apply_mix(key_a: String, key_b: String, t: float) -> void:
 		m.set_shader_parameter("tint", v["tint"])
 		m.set_shader_parameter("fog_col", fog)
 		m.set_shader_parameter("fog_density", v["fog_density"])
+	if street_mat:
+		street_mat.set_shader_parameter("tint", v["tint"])
+		street_mat.set_shader_parameter("fog_col", fog)
+		street_mat.set_shader_parameter("fog_density", v["fog_density"])
 	for m in lamp_mats:
 		m.set_shader_parameter("tint", v["tint"])
 		m.set_shader_parameter("fog_col", fog)
