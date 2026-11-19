@@ -6,7 +6,7 @@ class_name HintData
 
 const HINTS: Dictionary = {
 	"pologne_1939": ["Un dossier « TOP SECRET » fermé par un cachet de cire est posé sur le bureau. Il faut un outil pour l'ouvrir.",
-		"Ramasse le coupe-papier posé sur le bureau (côté droit), puis utilise-le sur le dossier au cachet rouge."],
+		"Ramasse les ciseaux posés sur le bureau (côté droit), puis utilise-les sur le dossier au cachet rouge."],
 	"declaration_guerre_1939": ["Un poste de radio est posé sur une petite table près du bureau, avec une note d'instructions à lire.",
 		"Ouvre la radio et règle la fréquence sur 390 kHz (BBC Londres), puis écoute l'annonce."],
 	"offensive_ouest_1940": ["Le sous-main vert sur le bureau cache une carte d'Europe.",

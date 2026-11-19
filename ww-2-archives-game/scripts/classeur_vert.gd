@@ -54,8 +54,10 @@ func _ready() -> void:
 	mi.material_override = green
 	body.add_child(mi)
 	# Modèle de Louka : le corps procédural est caché (la collision reste)
-	use_model = ModelVisual.attach(self, "classeur_corps.glb", Vector3(W, H, D), Vector3.ZERO, 180.0, "classeur_ref.glb", -1, "Modele_Corps") != null
+	use_model = ModelVisual.attach(self, "res://assets/models/louka3/casier_corps.glb", Vector3(W, H, D), Vector3.ZERO, 180.0, "res://assets/models/louka3/casier_ref.glb", -1, "Modele_Corps") != null
 	mi.visible = not use_model
+	if use_model:
+		ModelVisual.attach(self, "res://assets/models/louka3/casier_decor.glb", Vector3(W, H, D), Vector3.ZERO, 180.0, "res://assets/models/louka3/casier_ref.glb", -1, "Modele_Decor")
 
 	# Trois façades de tiroirs
 	var dh := H / 3.0 - 0.04
@@ -90,8 +92,8 @@ func _ready() -> void:
 	memo.add_child(mcs)
 	var sheet := _box(Vector3(0.2, 0.004, 0.15), cream)
 	memo.add_child(sheet)
-	memo.position = Vector3(0.28, H + 0.01, 0.0)
-	memo.rotation_degrees = Vector3(0, 14, 0)
+	memo.position = Vector3(-0.02, H + 0.01, 0.13)
+	memo.rotation_degrees = Vector3(0, 8, 0)
 	add_child(memo)
 
 func _box(size: Vector3, mat: Material) -> MeshInstance3D:
@@ -132,7 +134,7 @@ func _make_middle_drawer(front: MeshInstance3D, y: float, dh: float, gold: Mater
 	drawer.add_child(face)
 	if use_model:
 		face.visible = false
-		ModelVisual.attach(drawer, "classeur_tiroir.glb", Vector3(W, H, D), -drawer_closed_pos, 180.0, "classeur_ref.glb", -1, "Modele_Tiroir")
+		ModelVisual.attach(drawer, "res://assets/models/louka3/casier_tiroir.glb", Vector3(W, H, D), -drawer_closed_pos, 180.0, "res://assets/models/louka3/casier_ref.glb", -1, "Modele_Tiroir")
 	drawer.drawer_state_changed.connect(func(): _apply_state(drawer, true))
 	GameManager.game_loaded.connect(func(): _apply_state(drawer, false))
 	_apply_state(drawer, false)

@@ -102,6 +102,7 @@ func _set_period(new_period: int) -> void:
 ## Remet l'état en mémoire à zéro. Ne touche PAS au fichier de sauvegarde
 ## (voir delete_save() pour une vraie nouvelle partie).
 func reset_game() -> void:
+	_purge_dead_connections()
 	unlocked_dates.clear()
 	items.clear()
 	current_period = 1
@@ -183,3 +184,13 @@ func load_game() -> bool:
 func delete_save() -> void:
 	if FileAccess.file_exists(SAVE_PATH):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))
+
+
+## Après un rechargement de scène, des lambdas branchées par d'anciens nœuds (libérés) peuvent rester
+## connectées aux signaux : on les retire pour éviter erreurs et plantages.
+func _purge_dead_connections() -> void:
+	for sig_name in ["date_unlocked", "period_changed", "game_loaded", "item_obtained", "all_dates_completed"]:
+		for c in get_signal_connection_list(sig_name):
+			var cb: Callable = c["callable"]
+			if not cb.is_valid():
+				disconnect(sig_name, cb)

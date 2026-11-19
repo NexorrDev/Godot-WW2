@@ -7,6 +7,9 @@ class_name ModelVisual
 
 const DIR := "res://assets/models/louka2/"
 
+static func _full(f: String) -> String:
+	return f if f.begins_with("res://") else DIR + f
+
 ## Boîte englobante d'un modèle (dans le repère du modèle).
 static func model_aabb(path: String) -> AABB:
 	var scn := load(path) as PackedScene
@@ -37,12 +40,12 @@ static func _collect_aabb(root: Node3D, node: Node) -> AABB:
 ## (permet de caler plusieurs pièces d'un même meuble de la même façon) ;
 ## uniform_axis : 0/1/2 = mise à l'échelle uniforme sur cet axe (x, y, z du repère du parent), -1 = chaque axe séparément.
 static func attach(parent: Node3D, file: String, fit: Vector3, pos: Vector3 = Vector3.ZERO, yaw_deg: float = 0.0, ref: String = "", uniform_axis: int = -1, node_name: String = "Modele3D") -> Node3D:
-	var path := DIR + file
+	var path := _full(file)
 	var scn := load(path) as PackedScene
 	if scn == null:
 		push_warning("ModelVisual : modèle introuvable " + path)
 		return null
-	var box := model_aabb(DIR + ref) if ref != "" else model_aabb(path)
+	var box := model_aabb(_full(ref)) if ref != "" else model_aabb(path)
 	if box.size.x <= 0.0001:
 		return null
 	var swap := int(round(absf(yaw_deg) / 90.0)) % 2 == 1

@@ -45,6 +45,12 @@ func _apply_louka_models() -> void:
 			old.queue_free()
 		else:
 			body.queue_free()
+	# Ciseaux de Louka à la place du coupe-papier (même objet pour le jeu : tool_id "coupe_papier")
+	var cp := get_node_or_null("CoupePapier")
+	if cp:
+		var cm := cp.get_node_or_null("MeshInstance3D")
+		if cm and ModelVisual.attach(cp, "res://assets/models/louka3/ciseaux.glb", Vector3(0.2, 0.2, 0.2), Vector3(0, -0.006, 0), 0.0, "", 2, "Modele3D") != null:
+			cm.visible = false
 	var radio := get_node_or_null("Poste_Radio")
 	if radio:
 		var mesh := radio.get_node_or_null("MeshInstance3D")

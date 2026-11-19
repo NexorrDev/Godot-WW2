@@ -152,7 +152,7 @@ surface_material_override/0 = SubResource("Mat_Blotter")
 transform = Transform3D(0.94, 0, 0.34, 0, 1, 0, -0.34, 0, 0.94, 0.9, 0.762, 0.25)
 script = ExtResource("15_tool")
 tool_id = "coupe_papier"
-tool_label = "Coupe-papier"
+tool_label = "Ciseaux"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CoupePapier"]
 shape = SubResource("BoxShape3D_opener")

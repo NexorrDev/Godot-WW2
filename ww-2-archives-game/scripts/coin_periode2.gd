@@ -81,7 +81,7 @@ func _build_etagere() -> void:
 	cs.position = Vector3(0, 0.95, 0)
 	sh.add_child(cs)
 	add_child(sh)
-	if ModelVisual.attach(sh, "etagere.glb", Vector3(1.5, 1.9, 0.45), Vector3.ZERO, -90.0, "", -1, "Modele3D") == null:
+	if ModelVisual.attach(sh, "res://assets/models/louka3/bibliotheque.glb", Vector3(1.5, 1.9, 0.45), Vector3.ZERO, -90.0, "", -1, "Modele3D") == null:
 		# secours : planches simples si le modèle manque
 		sh.add_child(PropKit.box(Vector3(1.5, 1.9, 0.45), Color(0.30, 0.20, 0.12), Vector3(0, 0.95, 0)))
 

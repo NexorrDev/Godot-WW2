@@ -1,7 +1,7 @@
 extends DocumentItem
 class_name SealedDocumentItem
 
-## Dossier scellé : il faut un outil tranchant (coupe-papier) pour briser le cachet
+## Dossier scellé : il faut un outil tranchant (ciseaux) pour briser le cachet
 ## avant de lire la fiche. Une fois la date découverte, le dossier s'ouvre directement.
 
 @export var required_tools: Array[String] = ["coupe_papier"]
@@ -35,7 +35,7 @@ func _refresh() -> void:
 func interact() -> void:
 	if _is_sealed() and not GameManager.has_any_item(required_tools):
 		Sfx.play("click", -6.0)
-		get_tree().call_group("hud_progression", "show_info", "CACHET DE CIRE", "IL FAUT UN COUPE-PAPIER")
+		get_tree().call_group("hud_progression", "show_info", "CACHET DE CIRE", "IL FAUT DES CISEAUX")
 		return
 	if _is_sealed():
 		Sfx.play("stamp", -6.0) # le cachet craque

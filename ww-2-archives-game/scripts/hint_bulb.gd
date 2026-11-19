@@ -10,6 +10,8 @@ var btn: Button
 var icon: Control
 var idle := 0.0
 var t := 0.0
+var _alt_free := false
+var key_label: Label
 
 func _ready() -> void:
 	layer = 15
@@ -32,6 +34,17 @@ func _ready() -> void:
 	icon.set_anchors_preset(Control.PRESET_FULL_RECT)
 	icon.draw.connect(_draw_icon)
 	btn.add_child(icon)
+	# pastille « H » : sur PC la souris est capturée, on rappelle donc le raccourci
+	key_label = Label.new()
+	key_label.text = "H"
+	key_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	key_label.add_theme_font_size_override("font_size", 16)
+	key_label.add_theme_color_override("font_color", Color(0.1, 0.08, 0.05))
+	key_label.add_theme_color_override("font_outline_color", Color(0.95, 0.88, 0.6))
+	key_label.add_theme_constant_override("outline_size", 6)
+	key_label.position = Vector2(58, 52)
+	btn.add_child(key_label)
+	btn.tooltip_text = "Indices (touche H — ou maintenir Alt pour utiliser la souris)"
 	GameManager.date_unlocked.connect(func(_i, _d): idle = 0.0)
 	visible = false
 
@@ -43,6 +56,15 @@ func _process(delta: float) -> void:
 	var pl := _player()
 	var show: bool = pl != null and pl.get("can_control") == true
 	visible = show
+	# PC : maintenir Alt libère la souris pour cliquer sur l'ampoule, relâcher la recapture
+	if show and pl.get("touch") == null:
+		var alt := Input.is_key_pressed(KEY_ALT)
+		if alt and not _alt_free:
+			_alt_free = true
+			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		elif not alt and _alt_free:
+			_alt_free = false
+			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	if show:
 		idle += delta
 	t += delta
