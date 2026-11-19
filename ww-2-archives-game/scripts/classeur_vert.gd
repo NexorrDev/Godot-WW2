@@ -18,6 +18,7 @@ var drawer_front: Node3D
 var padlock: Node3D
 var drawer_closed_pos := Vector3.ZERO
 var drawer_doc: Node3D
+var use_model := false
 
 func _ready() -> void:
 	if get_child_count() > 0:
@@ -52,6 +53,9 @@ func _ready() -> void:
 	mi.mesh = bm
 	mi.material_override = green
 	body.add_child(mi)
+	# Modèle de Louka : le corps procédural est caché (la collision reste)
+	use_model = ModelVisual.attach(self, "classeur_corps.glb", Vector3(W, H, D), Vector3.ZERO, 180.0, "classeur_ref.glb", -1, "Modele_Corps") != null
+	mi.visible = not use_model
 
 	# Trois façades de tiroirs
 	var dh := H / 3.0 - 0.04
@@ -60,11 +64,14 @@ func _ready() -> void:
 		var front := _box(Vector3(W - 0.08, dh, 0.03), green)
 		front.position = Vector3(0, y, D / 2.0 + 0.012)
 		add_child(front)
+		front.visible = not use_model
 		var handle := _box(Vector3(0.22, 0.03, 0.03), dark)
 		handle.position = Vector3(0, y + 0.06, D / 2.0 + 0.04)
+		handle.visible = not use_model
 		add_child(handle)
 		var plate := _box(Vector3(0.14, 0.05, 0.005), cream)
 		plate.position = Vector3(0, y - 0.07, D / 2.0 + 0.03)
+		plate.visible = not use_model
 		add_child(plate)
 		if i == 1:
 			_make_middle_drawer(front, y, dh, gold)
@@ -123,6 +130,9 @@ func _make_middle_drawer(front: MeshInstance3D, y: float, dh: float, gold: Mater
 	front.visible = false  # la façade est portée par le tiroir
 	var face := _box(Vector3(W - 0.08, dh, 0.03), front.material_override)
 	drawer.add_child(face)
+	if use_model:
+		face.visible = false
+		ModelVisual.attach(drawer, "classeur_tiroir.glb", Vector3(W, H, D), -drawer_closed_pos, 180.0, "classeur_ref.glb", -1, "Modele_Tiroir")
 	drawer.drawer_state_changed.connect(func(): _apply_state(drawer, true))
 	GameManager.game_loaded.connect(func(): _apply_state(drawer, false))
 	_apply_state(drawer, false)

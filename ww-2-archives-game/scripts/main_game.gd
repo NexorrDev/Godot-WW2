@@ -11,6 +11,7 @@ func _ready() -> void:
 	# Démarre les sons (ambiance de bureau, clics de boutons...)
 	Sfx.ensure()
 	Music.ensure()
+	_apply_louka_models()
 	if main_menu:
 		main_menu.game_started.connect(_on_game_started)
 
@@ -22,3 +23,30 @@ func _on_game_started() -> void:
 		$PeriodTransition.intro()
 	if hud and hud.has_method("show_hud"):
 		hud.show_hud()
+
+
+## Modèles 3D de Louka (visuel seul). Le bureau devient un StaticBody3D à boîte de collision identique
+## à l'ancien CSG ; le poste de radio garde sa collision et son script, seul son maillage change.
+func _apply_louka_models() -> void:
+	var old := get_node_or_null("Bureau_Placeholder")
+	if old is CSGBox3D:
+		var pos: Vector3 = old.position
+		var size: Vector3 = old.size
+		var body := StaticBody3D.new()
+		body.name = "Bureau"
+		body.position = pos
+		var cs := CollisionShape3D.new()
+		var bs := BoxShape3D.new()
+		bs.size = size
+		cs.shape = bs
+		body.add_child(cs)
+		add_child(body)
+		if ModelVisual.attach(body, "bureau.glb", Vector3(size.x, size.y, size.z), Vector3(0, -size.y / 2.0, 0), 90.0, "", -1, "Modele3D") != null:
+			old.queue_free()
+		else:
+			body.queue_free()
+	var radio := get_node_or_null("Poste_Radio")
+	if radio:
+		var mesh := radio.get_node_or_null("MeshInstance3D")
+		if mesh and ModelVisual.attach(radio, "radio.glb", Vector3(0.5, 0.35, 0.28), Vector3(0, -0.175, 0), 0.0, "", -1, "Modele3D") != null:
+			mesh.visible = false

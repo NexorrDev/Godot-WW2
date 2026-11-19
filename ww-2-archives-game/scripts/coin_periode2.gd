@@ -70,39 +70,32 @@ func _build_veste() -> void:
 	veste.add_child(PropKit.box(Vector3(0.016, 0.1, 0.12), Color(0.28, 0.3, 0.23), Vector3(0.07, -0.18, -0.12)))
 
 func _build_etagere() -> void:
+	# Étagère de Louka (meuble à livres) : 1,52 x 1,90 x 0,80 m contre le mur nord. Collision = boîte simple.
 	var sh := StaticBody3D.new()
 	sh.name = "Etagere_Haute"
-	sh.position = Vector3(-0.65, 0, -3.1)
+	sh.position = Vector3(-0.65, 0, -3.03)
 	var cs := CollisionShape3D.new()
 	var bs := BoxShape3D.new()
-	bs.size = Vector3(1.05, 1.95, 0.32)
+	bs.size = Vector3(1.5, 1.9, 0.45)
 	cs.shape = bs
-	cs.position = Vector3(0, 0.975, 0)
+	cs.position = Vector3(0, 0.95, 0)
 	sh.add_child(cs)
-	var wood := Color(0.30, 0.20, 0.12)
-	for sx in [-0.5, 0.5]:
-		sh.add_child(PropKit.box(Vector3(0.04, 2.0, 0.3), wood, Vector3(sx, 1.0, 0)))
-	for y in [0.08, 0.52, 0.96, 1.40, 1.84]:
-		sh.add_child(PropKit.box(Vector3(1.0, 0.03, 0.3), wood, Vector3(0, y, 0)))
-	var cols := [Color(0.55, 0.15, 0.12), Color(0.15, 0.3, 0.5), Color(0.5, 0.42, 0.2), Color(0.2, 0.4, 0.25), Color(0.4, 0.3, 0.4)]
-	var k := 0
-	for y in [0.10, 0.54, 0.98, 1.42]:
-		for i in 6:
-			var h := 0.28 + (k % 3) * 0.03
-			sh.add_child(PropKit.box(Vector3(0.07, h, 0.22), cols[k % cols.size()], Vector3(-0.38 + i * 0.12, y + h / 2.0 + 0.015, 0.0)))
-			k += 1
 	add_child(sh)
+	if ModelVisual.attach(sh, "etagere.glb", Vector3(1.5, 1.9, 0.45), Vector3.ZERO, -90.0, "", -1, "Modele3D") == null:
+		# secours : planches simples si le modèle manque
+		sh.add_child(PropKit.box(Vector3(1.5, 1.9, 0.45), Color(0.30, 0.20, 0.12), Vector3(0, 0.95, 0)))
 
-	var boite := PropKit.item(self, "Boite_Mediterranee", "res://scripts/boite_item.gd", Vector3(-0.65, 2.0, -3.1), Vector3(0.5, 0.30, 0.30), Vector3.ZERO)
+	var boite := PropKit.item(self, "Boite_Mediterranee", "res://scripts/boite_item.gd", Vector3(-0.65, 2.05, -3.03), Vector3(0.5, 0.30, 0.30), Vector3.ZERO)
 	boite.add_child(PropKit.box(Vector3(0.46, 0.28, 0.28), Color(0.62, 0.55, 0.38)))
 	boite.add_child(PropKit.box(Vector3(0.40, 0.12, 0.012), Color(0.9, 0.88, 0.8), Vector3(0, 0.0, 0.146)))
 	boite.add_child(PropKit.label("MÉDITERRANÉE", 40, 0.0015, Color(0.15, 0.1, 0.08), Vector3(0, 0.0, 0.153)))
 
-	# Chaise (placeholder) : on la fait glisser vers l'étagère
-	var ch := PropKit.item(self, "Chaise_Etagere", "res://scripts/chaise_item.gd", Vector3(-0.65, 0, -1.9), Vector3(0.45, 0.9, 0.45), Vector3(0, 0.45, 0))
-	var wood2 := Color(0.34, 0.22, 0.13)
-	ch.add_child(PropKit.box(Vector3(0.44, 0.04, 0.44), wood2, Vector3(0, 0.45, 0)))
-	ch.add_child(PropKit.box(Vector3(0.44, 0.40, 0.04), wood2, Vector3(0, 0.67, 0.2)))
-	for sx in [-0.19, 0.19]:
-		for sz in [-0.19, 0.19]:
-			ch.add_child(PropKit.box(Vector3(0.04, 0.44, 0.04), wood2, Vector3(sx, 0.22, sz)))
+	# Chaise de Louka : on la fait glisser vers l'étagère
+	var ch := PropKit.item(self, "Chaise_Etagere", "res://scripts/chaise_item.gd", Vector3(-0.65, 0, -1.9), Vector3(0.6, 0.9, 0.6), Vector3(0, 0.45, 0), {"start_z": -1.9, "pushed_z": -2.45})
+	if ModelVisual.attach(ch, "chaise.glb", Vector3(0, 0.95, 0), Vector3.ZERO, 0.0, "", 1, "Modele3D") == null:
+		var wood2 := Color(0.34, 0.22, 0.13)
+		ch.add_child(PropKit.box(Vector3(0.44, 0.04, 0.44), wood2, Vector3(0, 0.45, 0)))
+		ch.add_child(PropKit.box(Vector3(0.44, 0.40, 0.04), wood2, Vector3(0, 0.67, 0.2)))
+		for sx in [-0.19, 0.19]:
+			for sz in [-0.19, 0.19]:
+				ch.add_child(PropKit.box(Vector3(0.04, 0.44, 0.04), wood2, Vector3(sx, 0.22, sz)))
